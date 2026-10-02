@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "description": "Relations fictives servant uniquement à démontrer le moteur. Remplacez-les par vos propres formules.",
+  "cotes": {
+    "A": {"label":"Cote A"},
+    "B": {"label":"Cote B"},
+    "C": {"label":"Cote C"}
+  },
+  "relations": [
+    {"equation":"A = B + 100"},
+    {"equation":"C = 2 * B"}
+  ],
+  "debits": []
+}
