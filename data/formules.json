@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "unite": "mm",
+  "cotes": {
+    "LP": { "label": "Largeur de porte (LP)" },
+    "LPB": { "label": "Largeur de porte bois (LPB)" },
+    "PASSAGE_LIBRE": { "label": "Passage libre" },
+    "ENTRE_MONTANTS": { "label": "Entre montants (EM)" },
+    "ENTRAXE_MIN": { "label": "Entraxe minimum" },
+    "ARRET_LISSE": { "label": "Arrêt de lisse" },
+    "LISSE_BASSE_MIN": { "label": "Lisse basse minimum" },
+    "LISSE_BASSE": { "label": "Lisse basse" },
+    "LARGEUR_REMPLISSAGE": { "label": "Largeur du remplissage" },
+    "POUTRE": { "label": "Longueur de poutre" },
+    "DISTANCE_SIMPLE": { "label": "Distance simple vantail (Dsv)" },
+    "EM1": { "label": "Entre montant et profil de réception (EM1)" },
+    "COUPE_SIMPLE": { "label": "Distance de coupe — simple vantail" },
+    "AUTRE_COTE_SIMPLE": { "label": "Autre cote de coupe — simple vantail" },
+    "DISTANCE_DOUBLE": { "label": "Distance double vantail (Ddv)" },
+    "COUPE_DOUBLE": { "label": "Distance de coupe — double vantail" },
+    "AUTRE_COTE_DOUBLE": { "label": "Autre cote de coupe — double vantail" },
+    "H": { "label": "Hauteur de porte (H)" },
+    "H1": { "label": "Hauteur H1" },
+    "HSP": { "label": "Hauteur sous plafond (HSP)" },
+    "HAUTEUR_VITRAGE_HSP": { "label": "Hauteur de vitrage (depuis HSP)" },
+    "HAUTEUR_REMPLISSAGE": { "label": "Hauteur de remplissage" },
+    "HAUTEUR_VITRAGE_H1": { "label": "Hauteur de vitrage (depuis H1)" },
+    "HAUTEUR_SOUS_POUTRE": { "label": "Hauteur sous poutre" },
+    "PARCLOSE": { "label": "Parclose de finition" }
+  },
+  "variantes": {
+    "simple": {
+      "label": "Simple vantail",
+      "cotes": ["LP", "LPB", "PASSAGE_LIBRE", "ENTRE_MONTANTS", "ENTRAXE_MIN", "ARRET_LISSE", "LISSE_BASSE_MIN", "LISSE_BASSE", "LARGEUR_REMPLISSAGE", "POUTRE", "DISTANCE_SIMPLE", "EM1", "COUPE_SIMPLE", "AUTRE_COTE_SIMPLE"],
+      "relations": [
+        { "equation": "LP = (ARRET_LISSE - 3) / 2" },
+        { "equation": "PASSAGE_LIBRE = LP - 124" },
+        { "equation": "ENTRE_MONTANTS = 2 * LP - 73" },
+        { "equation": "ENTRAXE_MIN = 2 * LP - 37" },
+        { "equation": "ARRET_LISSE = 2 * LP + 3" },
+        { "equation": "LISSE_BASSE_MIN = LP - 105" },
+        { "equation": "DISTANCE_SIMPLE = EM1" },
+        { "equation": "COUPE_SIMPLE = DISTANCE_SIMPLE - LP - 9" },
+        { "equation": "AUTRE_COTE_SIMPLE = LP - 59" },
+        { "equation": "POUTRE = ENTRE_MONTANTS - 23" },
+        { "equation": "LARGEUR_REMPLISSAGE = LISSE_BASSE + 19" }
+      ]
+    },
+    "double": {
+      "label": "Double vantail",
+      "cotes": ["LP", "LPB", "PASSAGE_LIBRE", "ENTRE_MONTANTS", "ENTRAXE_MIN", "ARRET_LISSE", "LISSE_BASSE_MIN", "LISSE_BASSE", "LARGEUR_REMPLISSAGE", "POUTRE", "DISTANCE_DOUBLE", "COUPE_DOUBLE", "AUTRE_COTE_DOUBLE"],
+      "relations": [
+        { "equation": "LP = (ARRET_LISSE + 101) / 4" },
+        { "equation": "PASSAGE_LIBRE = 2 * LP - 247" },
+        { "equation": "ENTRE_MONTANTS = 4 * LP - 177" },
+        { "equation": "ENTRAXE_MIN = 4 * LP - 141" },
+        { "equation": "ARRET_LISSE = 4 * LP - 101" },
+        { "equation": "LISSE_BASSE_MIN = LP - 105" },
+        { "equation": "DISTANCE_DOUBLE = ENTRE_MONTANTS" },
+        { "equation": "COUPE_DOUBLE = DISTANCE_DOUBLE / 2 - LP - 16.2" },
+        { "equation": "AUTRE_COTE_DOUBLE = 2 * LP - 103" },
+        { "equation": "POUTRE = ENTRE_MONTANTS - 20" },
+        { "equation": "LARGEUR_REMPLISSAGE = LISSE_BASSE + 19" }
+      ]
+    }
+  },
+  "relationsHauteurs": [
+    { "equation": "H1 - 60 = H - 85" },
+    { "equation": "HAUTEUR_VITRAGE_HSP = HSP - 53" },
+    { "equation": "HAUTEUR_REMPLISSAGE = H1 - 26" },
+    { "equation": "HAUTEUR_VITRAGE_H1 = H1 - 28.5" },
+    { "equation": "HAUTEUR_SOUS_POUTRE = H1 - 36" },
+    { "equation": "PARCLOSE = HAUTEUR_SOUS_POUTRE + 24" }
+  ],
+  "limites": {
+    "LP": { "min": 680, "max": 1300 },
+    "LPB": { "max": 1230 },
+    "ENTRE_MONTANTS": { "max": 3000 },
+    "H": { "max": 3000 }
+  }
+}
