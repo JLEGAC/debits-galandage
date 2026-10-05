@@ -1,16 +1,15 @@
 import rules from "../data/regles-calcul.json" with { type: "json" };
-import { solveRelations, doorWidthWarning } from "./formulas.js";
+import { solveRelationGroups, doorWidthWarning } from "./formulas.js";
 import { buildCutList } from "./cutlist.js";
 
 const $ = id => document.getElementById(id);
 const groups = [
-  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"] },
-  { title:"Distances et coupes horizontales", keys:["EM1","L1","L2"] },
+  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE","EM1","L1","L2"] },
   { title:"Hauteurs", keys:["H","HP","H1","HSP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
 ];
 const state = {
   doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none",
-  manualValues:{}, manualText:{}, invalidValues:{}
+  manualValues:{}, manualText:{}, invalidValues:{}, conflicts:[], lastEditedKey:null
 };
 const numeric = value => {
   const normalized = String(value).trim().replace(",", ".");
@@ -37,6 +36,7 @@ function renderInputs() {
     const key = input.dataset.cote;
     const raw = input.value;
     const value = numeric(raw);
+    state.lastEditedKey = key;
     if (value === null) {
       delete state.manualValues[key];
       delete state.manualText[key];
@@ -68,14 +68,21 @@ function relationWarnings(solved) {
 }
 
 function renderCoteFields(solved, activeInput) {
+  const conflictKeys = new Set(state.conflicts.flatMap(conflict => conflict.givenKeys));
+  const affectedKeys = new Set(state.conflicts.flatMap(conflict => [...conflict.vars]));
   document.querySelectorAll("input[data-cote]").forEach(input => {
     const key = input.dataset.cote;
     const indicator = input.parentElement.querySelector(".origin-indicator");
     const isManual = Object.hasOwn(state.manualValues, key);
     const isInvalid = Object.hasOwn(state.invalidValues, key);
+    const isConflict = isManual && conflictKeys.has(key);
+    const isAffected = !isManual && affectedKeys.has(key);
     const isCalculated = input !== activeInput && !isManual && !isInvalid && Number.isFinite(solved[key]);
     input.classList.toggle("is-invalid", isInvalid);
+    input.classList.toggle("is-input-conflict", isConflict);
     input.parentElement.classList.toggle("is-calculated", isCalculated);
+    input.parentElement.classList.toggle("has-input-conflict", isConflict);
+    input.parentElement.classList.toggle("has-calculation-conflict", isAffected);
     indicator.hidden = !isCalculated;
     if (input === activeInput) return;
     if (isInvalid) input.value = state.invalidValues[key];
@@ -87,15 +94,23 @@ function renderCoteFields(solved, activeInput) {
 function renderCutlist(solved) {
   const rows = buildCutList(rules.debits, { leaf:state.leaf, transom:state.transom !== "none", fixedGlazed:state.infill === "glazed", values:solved });
   const unknown = rows.filter(row => row.missing.length).length;
+  const conflictCount = rows.filter(row => {
+    const variables = row.longueur ? row.longueur.match(/[A-Za-zÀ-ÿ_][\wÀ-ÿ]*/g) || [] : [];
+    return variables.some(key => state.conflicts.some(item => item.vars.has(key)));
+  }).length;
   $("cutlist").innerHTML = rows.map(rule => {
     const qText = rule.quantity == null ? "À préciser" : rule.quantity;
+    const ruleVars = rule.longueur ? [...new Set(rule.longueur.match(/[A-Za-zÀ-ÿ_][\wÀ-ÿ]*/g) || [])] : [];
+    const conflict = ruleVars.some(key => state.conflicts.some(item => item.vars.has(key)));
     const lText = rule.length == null ? "À préciser" : `${format(rule.length)} mm`;
-    const status = rule.missing.length ? `À préciser : ${rule.missing.join(", ")}` : "Calculé";
-    return `<tr class="${rule.missing.length ? "pending" : ""}"><th scope="row">${rule.profil}<small>${rule.note ?? ""}</small></th><td>${qText}</td><td>${lText}</td><td>${status}</td></tr>`;
+    const status = conflict ? "À vérifier" : rule.missing.length ? `À préciser : ${rule.missing.join(", ")}` : "Calculé";
+    return `<tr class="${conflict ? "conflict-row" : rule.missing.length ? "pending" : ""}"><th scope="row">${rule.profil}<small>${rule.note ?? ""}</small></th><td>${qText}</td><td>${lText}</td><td>${status}</td></tr>`;
   }).join("");
-  const message = unknown
-    ? `<strong>Liste partielle : ${unknown} ligne(s) restent à préciser.</strong><p>Les lignes incomplètes sont gardées visibles pour repérer les règles ou données qui manquent. Elles ne sont pas remplacées par des hypothèses.</p>`
-    : `<strong>Les profils affichés ont une quantité et une longueur calculées.</strong><p>Contrôlez les cotes et options avant la préparation de la fabrication.</p>`;
+  const message = [
+    unknown ? `<strong>Liste partielle : ${unknown} ligne(s) restent à préciser.</strong><p>Les lignes incomplètes sont gardées visibles pour repérer les règles ou données qui manquent. Elles ne sont pas remplacées par des hypothèses.</p>` : "",
+    conflictCount ? `<p>${conflictCount} ligne(s) de débit sont liées à des cotes saisies en conflit ; les longueurs restent affichées et sont à vérifier.</p>` : "",
+    !unknown && !conflictCount ? `<strong>Les profils affichés ont une quantité et une longueur calculées.</strong><p>Contrôlez les cotes et options avant la préparation de la fabrication.</p>` : ""
+  ].filter(Boolean).join("");
   const receiverNote = state.leaf === "double" ? "<p>En double vantail, la notice ne prévoit pas de profil de réception.</p>" : "";
   $("cutlist-notice").innerHTML = message + receiverNote;
   const leafLabel = state.leaf === "single" ? "Simple vantail" : "Double vantail";
@@ -117,17 +132,16 @@ function renderFormulas() {
 function calculate(activeInput = null) {
   const messages = [];
   for (const key of Object.keys(state.invalidValues)) messages.push(`La cote « ${rules.cotes[key].label} » doit être un nombre.`);
-  let solved = {};
-  let inconsistent = false;
-  try { solved = solveRelations(activeRelations(), state.manualValues); }
-  catch (error) { inconsistent = true; messages.push(error.message); }
-  if (inconsistent) solved = {};
+  const preferredKey = activeInput?.dataset.cote ?? state.lastEditedKey;
+  const result = solveRelationGroups(activeRelations(), state.manualValues, preferredKey);
+  state.conflicts = result.conflicts;
+  const solved = result.values;
   messages.push(...relationWarnings(solved));
   renderCoteFields(solved, activeInput);
   const validation = $("validation");
   validation.className = `validation${messages.length ? " warning" : ""}`;
   validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
-  renderCutlist(inconsistent ? {} : solved);
+  renderCutlist(solved);
 }
 
 $("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; calculate(); });
@@ -139,6 +153,7 @@ $("reset").addEventListener("click", () => {
   state.manualValues = {};
   state.manualText = {};
   state.invalidValues = {};
+  state.lastEditedKey = null;
   state.doorMaterial = "aluminium"; state.leaf = "single"; state.infill = "glazed"; state.transom = "none";
   $("door-material").value = state.doorMaterial;
   $("leaf-count").value = state.leaf; $("infill").value = state.infill; $("transom").value = state.transom;

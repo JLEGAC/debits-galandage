@@ -72,3 +72,74 @@ export function solveRelations(relations, givens) {
   for(let r=0;r<pivotRow;r++){const col=pivotCols[r];if(matrix[r].slice(col+1,columns.length).every(n=>Math.abs(n)<EPSILON))values[columns[col]]=matrix[r][columns.length]}
   return values;
 }
+
+function variablesInEquation(equation) {
+  return [...new Set((equation.match(/[A-Za-zÀ-ÿ_][\wÀ-ÿ]*/g) || []).filter(token => !["x"].includes(token)))];
+}
+
+// Résout les sous-ensembles de relations indépendants pour conserver les calculs
+// des autres familles de cotes lorsqu'une famille contient une contradiction.
+export function solveRelationGroups(relations, givens, preferredKey = null) {
+  const parent = new Map();
+  const root = key => {
+    if (!parent.has(key)) parent.set(key, key);
+    if (parent.get(key) !== key) parent.set(key, root(parent.get(key)));
+    return parent.get(key);
+  };
+  const join = (a, b) => { const ra = root(a), rb = root(b); if (ra !== rb) parent.set(rb, ra); };
+  const relationVars = relations.map(relation => variablesInEquation(relation.equation));
+  for (const vars of relationVars) for (const name of vars.slice(1)) join(vars[0], name);
+  const groups = new Map();
+  relations.forEach((relation, index) => {
+    const vars = relationVars[index];
+    const key = vars.length ? root(vars[0]) : `relation-${index}`;
+    if (!groups.has(key)) groups.set(key, { relations: [], vars: new Set() });
+    const group = groups.get(key);
+    group.relations.push(relation);
+    vars.forEach(name => group.vars.add(name));
+  });
+  // Une cote saisie sans relation reste disponible telle quelle.
+  const values = {};
+  const conflicts = [];
+  for (const group of groups.values()) {
+    const groupGivens = Object.fromEntries(Object.entries(givens).filter(([key]) => group.vars.has(key)));
+    try {
+      Object.assign(values, solveRelations(group.relations, groupGivens));
+    } catch {
+      const givenKeys = Object.keys(groupGivens);
+      const conflictKeys = minimalConflict(group.relations, groupGivens);
+      const involved = conflictKeys.length ? conflictKeys : givenKeys;
+      conflicts.push({ vars: group.vars, givenKeys: involved });
+
+      // Garde une solution visible en prenant la dernière cote modifiée comme
+      // référence, tout en conservant chaque saisie contradictoire dans l'UI.
+      const independent = Object.fromEntries(Object.entries(groupGivens).filter(([key]) => !involved.includes(key)));
+      const anchors = [preferredKey, ...involved].filter((key, index, list) => key && involved.includes(key) && list.indexOf(key) === index);
+      let recovered = false;
+      for (const anchor of anchors) {
+        const candidate = { ...independent, [anchor]: groupGivens[anchor] };
+        try {
+          Object.assign(values, solveRelations(group.relations, candidate));
+          recovered = true;
+          break;
+        } catch { /* essaie une autre cote de référence */ }
+      }
+      if (!recovered && anchors.length) {
+        Object.assign(values, solveRelations(group.relations, { [anchors[0]]: groupGivens[anchors[0]] }));
+      }
+    }
+  }
+  for (const [key, value] of Object.entries(givens)) if (!Object.hasOwn(values, key)) values[key] = value;
+  return { values, conflicts };
+}
+
+function minimalConflict(relations, givens) {
+  let keys = Object.keys(givens);
+  if (keys.length < 2) return keys;
+  // Réduit l'ensemble des saisies à celles nécessaires pour conserver l'incompatibilité.
+  for (const key of [...keys]) {
+    const candidate = Object.fromEntries(keys.filter(other => other !== key).map(other => [other, givens[other]]));
+    try { solveRelations(relations, candidate); } catch { keys = keys.filter(other => other !== key); }
+  }
+  return keys;
+}
