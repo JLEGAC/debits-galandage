@@ -6,7 +6,7 @@ PWA installable pour calculer dans les deux sens les cotes d’un galandage et p
 
 `data/regles-calcul.json` est la source unique des cotes, relations, limites et règles de débit. Pour corriger une formule, modifier l’équation correspondante dans `relations`. Les profils et débits sont décrits dans `debits`. Les quantités dépendant du nombre de vantaux ou des parties fixes utilisent un identifiant de règle (`quantiteRule`) traité dans `src/cutlist.js`.
 
-Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Quand une quantité ou une longueur n’est pas fournie, la liste affiche « À préciser » plutôt que de supposer une valeur.
+Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Chaque cote dispose d’un seul champ : les valeurs saisies restent modifiables et les valeurs déduites apparaissent dans les mêmes champs avec le repère `fx`. La liste des débits se trouve dans le même panneau et se recalcule à chaque événement de saisie. Une valeur calculée n’est pas réutilisée comme donnée d’entrée ; si les données ne déterminent pas une cote de façon unique, le champ reste vide. Quand une quantité ou une longueur n’est pas fournie, la liste affiche « À préciser » plutôt que de supposer une valeur.
 
 ## Formules actuellement intégrées
 

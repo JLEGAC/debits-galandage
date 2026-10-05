@@ -8,7 +8,10 @@ const groups = [
   { title:"Distances et coupes horizontales", keys:["EM1","L1","L2"] },
   { title:"Hauteurs", keys:["H","HP","H1","HSP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
 ];
-const state = { doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none", values:{} };
+const state = {
+  doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none",
+  manualValues:{}, manualText:{}, invalidValues:{}
+};
 const numeric = value => {
   const normalized = String(value).trim().replace(",", ".");
   if (!normalized) return null;
@@ -27,16 +30,29 @@ function renderInputs() {
       <h3>${group.title}</h3>
       <div class="fields">${group.keys.map(key => {
         const item = rules.cotes[key];
-        return `<label class="field">${item.label}<span class="input-with-unit"><input inputmode="decimal" type="text" data-cote="${key}" value="${state.values[key] ?? ""}" placeholder="Saisir cette cote"><small>mm</small></span></label>`;
+        return `<label class="field">${item.label}<span class="input-with-unit"><span class="origin-indicator" hidden title="Cote calculée à partir des relations" aria-label="Cote calculée">fx</span><input inputmode="decimal" type="text" data-cote="${key}" placeholder="Saisir cette cote" autocomplete="off"><small>mm</small></span></label>`;
       }).join("")}</div>
     </section>`).join("");
   $("fields").querySelectorAll("input[data-cote]").forEach(input => input.addEventListener("input", () => {
-    const value = numeric(input.value);
-    if (value === null) delete state.values[input.dataset.cote];
-    else if (Number.isFinite(value)) state.values[input.dataset.cote] = value;
-    else delete state.values[input.dataset.cote];
-    calculate();
+    const key = input.dataset.cote;
+    const raw = input.value;
+    const value = numeric(raw);
+    if (value === null) {
+      delete state.manualValues[key];
+      delete state.manualText[key];
+      delete state.invalidValues[key];
+    } else if (Number.isFinite(value)) {
+      state.manualValues[key] = value;
+      state.manualText[key] = raw;
+      delete state.invalidValues[key];
+    } else {
+      delete state.manualValues[key];
+      delete state.manualText[key];
+      state.invalidValues[key] = raw;
+    }
+    calculate(input);
   }));
+  $("fields").querySelectorAll("input[data-cote]").forEach(input => input.addEventListener("blur", () => calculate()));
 }
 
 function relationWarnings(solved) {
@@ -51,12 +67,21 @@ function relationWarnings(solved) {
   return [...new Set(errors)];
 }
 
-function renderValues(target, keys, solved) {
-  $(target).innerHTML = keys.map(key => {
-    const item = rules.cotes[key];
-    const value = solved[key];
-    return `<div class="result-card"><span>${item.label}</span><strong>${format(value)} <small>${Number.isFinite(value) ? "mm" : ""}</small></strong></div>`;
-  }).join("");
+function renderCoteFields(solved, activeInput) {
+  document.querySelectorAll("input[data-cote]").forEach(input => {
+    const key = input.dataset.cote;
+    const indicator = input.parentElement.querySelector(".origin-indicator");
+    const isManual = Object.hasOwn(state.manualValues, key);
+    const isInvalid = Object.hasOwn(state.invalidValues, key);
+    const isCalculated = input !== activeInput && !isManual && !isInvalid && Number.isFinite(solved[key]);
+    input.classList.toggle("is-invalid", isInvalid);
+    input.parentElement.classList.toggle("is-calculated", isCalculated);
+    indicator.hidden = !isCalculated;
+    if (input === activeInput) return;
+    if (isInvalid) input.value = state.invalidValues[key];
+    else if (isManual) input.value = state.manualText[key] ?? format(state.manualValues[key]);
+    else input.value = isCalculated ? format(solved[key]) : "";
+  });
 }
 
 function renderCutlist(solved) {
@@ -89,24 +114,20 @@ function renderFormulas() {
   }).join("") + rules.conditions.map(rule => `<div><span>Limite</span><code>${escape(rule.message)}</code></div>`).join("");
 }
 
-function calculate() {
+function calculate(activeInput = null) {
   const messages = [];
-  const invalidField = [...document.querySelectorAll("input[data-cote]")].find(input => Number.isNaN(numeric(input.value)));
-  if (invalidField) messages.push(`La cote « ${rules.cotes[invalidField.dataset.cote].label} » doit être un nombre.`);
+  for (const key of Object.keys(state.invalidValues)) messages.push(`La cote « ${rules.cotes[key].label} » doit être un nombre.`);
   let solved = {};
-  try { solved = solveRelations(activeRelations(), state.values); }
-  catch (error) { messages.push(error.message); }
+  let inconsistent = false;
+  try { solved = solveRelations(activeRelations(), state.manualValues); }
+  catch (error) { inconsistent = true; messages.push(error.message); }
+  if (inconsistent) solved = {};
   messages.push(...relationWarnings(solved));
+  renderCoteFields(solved, activeInput);
   const validation = $("validation");
   validation.className = `validation${messages.length ? " warning" : ""}`;
   validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
-  const horizontal = ["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"];
-  const vertical = ["H","HP","H1","HSP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"];
-  horizontal.push("L1","L2");
-  horizontal.push("LBF");
-  renderValues("horizontal-results", horizontal, solved);
-  renderValues("vertical-results", vertical, solved);
-  renderCutlist(solved);
+  renderCutlist(inconsistent ? {} : solved);
 }
 
 $("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; calculate(); });
@@ -115,7 +136,9 @@ $("infill").addEventListener("change", event => { state.infill = event.target.va
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
 $("print").addEventListener("click", () => window.print());
 $("reset").addEventListener("click", () => {
-  state.values = {};
+  state.manualValues = {};
+  state.manualText = {};
+  state.invalidValues = {};
   state.doorMaterial = "aluminium"; state.leaf = "single"; state.infill = "glazed"; state.transom = "none";
   $("door-material").value = state.doorMaterial;
   $("leaf-count").value = state.leaf; $("infill").value = state.infill; $("transom").value = state.transom;

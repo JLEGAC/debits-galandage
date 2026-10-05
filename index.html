@@ -33,20 +33,11 @@
     </section>
 
     <section class="panel" aria-labelledby="dimensions-title">
-      <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes du projet</h2><p>Vous pouvez saisir plusieurs cotes connues. Les résultats sont recalculés automatiquement, quelle que soit la cote de départ.</p></div></div>
+      <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes du projet et préparation des débits</h2><p>Saisissez une ou plusieurs cotes. Les cotes liées et les longueurs de débit se mettent à jour dès la saisie.</p></div></div>
+      <p class="hint live-help">Saisissez une cote dans son champ, même si elle était calculée. Le repère <strong>fx</strong> identifie les valeurs calculées.</p>
       <div id="fields"></div>
-      <div class="calculated-cotes">
-        <h3 class="subheading">Cotes calculées</h3>
-        <p class="hint">Les valeurs se mettent à jour à partir des cotes saisies. Vous pouvez aussi saisir une cote calculée pour repartir de celle-ci.</p>
-        <h4 class="subheading">Largeurs et distances</h4><div id="horizontal-results" class="results-grid"></div>
-        <h4 class="subheading">Hauteurs</h4><div id="vertical-results" class="results-grid"></div>
-      </div>
       <div id="validation" class="validation" role="status" aria-live="polite"></div>
-      <p class="hint">Toutes les valeurs sont en millimètres.</p>
-    </section>
-
-    <section class="panel" aria-labelledby="cutlist-title">
-      <div class="section-heading"><span class="step">03</span><div><h2 id="cutlist-title">Liste des profils à débiter</h2><p>Quantités et longueurs renseignées à partir des règles disponibles.</p></div></div>
+      <h3 id="cutlist-title" class="subheading">Liste des profils à débiter</h3>
       <p id="print-summary" class="print-summary"></p>
       <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>État / règle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
       <div id="cutlist-notice" class="cutlist-notice"></div>

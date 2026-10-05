@@ -10,14 +10,18 @@ test("démarrage sans référence à l'ancien champ LPB supprimé", () => {
   assert.match(main, /renderInputs\(\);\s*renderFormulas\(\);\s*calculate\(\);/);
 });
 
-test("toutes les cotes sont dépliées et les résultats restent dans la section 02", () => {
+test("cotes saisies, cotes calculées et liste de débit sont dans un espace unique", () => {
   assert.doesNotMatch(main, /<details class="dimension-group"/);
-  assert.doesNotMatch(html, /id="results-title"/);
-  const projectSection = html.slice(html.indexOf('aria-labelledby="dimensions-title"'), html.indexOf('aria-labelledby="cutlist-title"'));
+  assert.doesNotMatch(html, /id="horizontal-results"|id="vertical-results"/);
+  assert.match(main, /addEventListener\("input"/);
+  assert.match(main, /manualValues/);
+  assert.match(main, /origin-indicator/);
+  const projectSection = html.slice(html.indexOf('aria-labelledby="dimensions-title"'), html.indexOf('aria-labelledby="formula-title"'));
   assert.match(projectSection, /id="fields"/);
-  assert.match(projectSection, /id="horizontal-results"/);
-  assert.match(projectSection, /id="vertical-results"/);
-  assert.match(html, /<span class="step">03<\/span><div><h2 id="cutlist-title">/);
+  assert.match(projectSection, /id="cutlist"/);
+  assert.match(projectSection, /id="cutlist-title"/);
+  assert.doesNotMatch(projectSection, /aria-labelledby="cutlist-title"/);
+  assert.doesNotMatch(html, /<span class="step">03<\/span>/);
 });
 
 test("l'imposte a seulement un choix présence/absence", () => {
