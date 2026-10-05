@@ -114,7 +114,6 @@ $("leaf-count").addEventListener("change", event => { state.leaf = event.target.
 $("door-material").addEventListener("change", event => { state.doorMaterial = event.target.value; calculate(); });
 $("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
-$("lpb").addEventListener("input", calculate);
 $("print").addEventListener("click", () => window.print());
 $("reset").addEventListener("click", () => {
   state.values = {};
