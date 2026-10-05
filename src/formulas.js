@@ -38,6 +38,14 @@ export function evaluateExpression(expression, values) {
   return Number.isFinite(result) ? result : null;
 }
 
+export function doorWidthWarning(width, material) {
+  if (!Number.isFinite(width)) return null;
+  if (width < 680) return "La largeur de porte doit être d’au moins 680 mm.";
+  const limit = material === "wood" ? 1230 : 1300;
+  if (width > limit) return `La largeur de porte ${material === "wood" ? "bois" : "aluminium"} ne doit pas dépasser ${limit.toLocaleString("fr-FR")} mm.`;
+  return null;
+}
+
 export function solveRelations(relations, givens) {
   const names = new Set(Object.keys(givens));
   const rows = relations.map(({ equation }) => {

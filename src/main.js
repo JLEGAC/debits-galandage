@@ -1,14 +1,14 @@
 import rules from "../data/regles-calcul.json" with { type: "json" };
-import { solveRelations } from "./formulas.js";
+import { solveRelations, doorWidthWarning } from "./formulas.js";
 import { buildCutList } from "./cutlist.js";
 
 const $ = id => document.getElementById(id);
 const groups = [
   { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"] },
   { title:"Distances et coupes horizontales", keys:["EM1","DSV","DDV","L1","L2"] },
-  { title:"Hauteurs", keys:["H","H1","HSP","HP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
+  { title:"Hauteurs", keys:["H","H1","HSP","HP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
 ];
-const state = { leaf:"single", infill:"glazed", transom:"none", values:{} };
+const state = { doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none", values:{} };
 const numeric = value => {
   const normalized = String(value).trim().replace(",", ".");
   if (!normalized) return null;
@@ -46,9 +46,8 @@ function relationWarnings(solved) {
     const value = solved[condition.code];
     if (condition.min != null && value < condition.min || condition.max != null && value > condition.max) errors.push(condition.message);
   }
-  const rawLPB = numeric($("lpb").value);
-  if (Number.isNaN(rawLPB)) errors.push("La largeur de porte bois LPB doit être un nombre.");
-  if (Number.isFinite(rawLPB) && rawLPB > 1230) errors.push("La largeur de porte bois LPB ne doit pas dépasser 1 230 mm.");
+  const widthWarning = doorWidthWarning(solved.LP, state.doorMaterial);
+  if (widthWarning) errors.push(widthWarning);
   return [...new Set(errors)];
 }
 
@@ -72,13 +71,14 @@ function renderCutlist(solved) {
   const message = unknown
     ? `<strong>Liste partielle : ${unknown} ligne(s) restent à préciser.</strong><p>Les lignes incomplètes sont gardées visibles pour repérer les règles ou données qui manquent. Elles ne sont pas remplacées par des hypothèses.</p>`
     : `<strong>Les profils affichés ont une quantité et une longueur calculées.</strong><p>Contrôlez les cotes et options avant la préparation de la fabrication.</p>`;
-  $("cutlist-notice").innerHTML = message;
+  const receiverNote = state.leaf === "double" ? "<p>En double vantail, la notice ne prévoit pas de profil de réception.</p>" : "";
+  $("cutlist-notice").innerHTML = message + receiverNote;
   const leafLabel = state.leaf === "single" ? "Simple vantail" : "Double vantail";
   const infillLabel = $("infill").selectedOptions[0].textContent;
   const transomLabel = $("transom").selectedOptions[0].textContent;
-  const lpb = numeric($("lpb").value);
   const fixedCount = state.leaf === "single" ? 1 : 2;
-  $("print-summary").textContent = `${leafLabel} · Parties fixes ${infillLabel.toLowerCase()} (${fixedCount}) · ${transomLabel}${state.transom !== "none" ? " · 2 départs mur avec imposte" : ""}${Number.isFinite(lpb) ? ` · LPB ${format(lpb)} mm` : ""}`;
+  const materialLabel = state.doorMaterial === "wood" ? "Porte bois" : "Porte aluminium";
+  $("print-summary").textContent = `${materialLabel} · ${leafLabel} · Parties fixes ${infillLabel.toLowerCase()} (${fixedCount}) · ${transomLabel}${state.transom !== "none" ? " · 2 départs mur" : ""}`;
 }
 
 function renderFormulas() {
@@ -101,24 +101,26 @@ function calculate() {
   validation.className = `validation${messages.length ? " warning" : ""}`;
   validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
   const horizontal = ["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DSV","DDV","DPOUTRE"];
-  const vertical = ["H","H1","HSP","HP","HSB","HVITRE","HREM","HVT43","HPAR"];
+  const vertical = ["H","H1","HSP","HP","SEP","HSB","HVITRE","HREM","HVT43","HPAR"];
   horizontal.push("L1","L2");
   if (state.transom !== "none") vertical.push("CP_IMPOSTE","PM_IMPOSTE");
+  horizontal.push("LBF");
   renderValues("horizontal-results", horizontal, solved);
   renderValues("vertical-results", vertical, solved);
   renderCutlist(solved);
 }
 
 $("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; calculate(); });
+$("door-material").addEventListener("change", event => { state.doorMaterial = event.target.value; calculate(); });
 $("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
 $("lpb").addEventListener("input", calculate);
 $("print").addEventListener("click", () => window.print());
 $("reset").addEventListener("click", () => {
   state.values = {};
-  state.leaf = "single"; state.infill = "glazed"; state.transom = "none";
+  state.doorMaterial = "aluminium"; state.leaf = "single"; state.infill = "glazed"; state.transom = "none";
+  $("door-material").value = state.doorMaterial;
   $("leaf-count").value = state.leaf; $("infill").value = state.infill; $("transom").value = state.transom;
-  $("lpb").value = "";
   renderInputs(); calculate();
 });
 renderInputs();

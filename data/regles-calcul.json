@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "unite": "mm",
   "cotes": {
     "LP": {"label":"Largeur de porte"},
@@ -9,6 +9,7 @@
     "ADL": {"label":"Arrêt de lisse"},
     "LB": {"label":"Lisse basse minimum"},
     "LREM": {"label":"Largeur du remplissage"},
+    "LBF": {"label":"Longueur de lisse basse de la partie fixe"},
     "EM1": {"label":"EM1 — distance montant / réception (simple vantail)"},
     "DSV": {"label":"Dsv — distance simple vantail"},
     "DDV": {"label":"Ddv — distance double vantail"},
@@ -16,13 +17,14 @@
     "H1": {"label":"H1 — hauteur de référence"},
     "HSP": {"label":"Hauteur sous plafond"},
     "HP": {"label":"Hauteur de poutre"},
+    "SEP": {"label":"Sol / entraxe poutre"},
     "HSB": {"label":"Hauteur sous poutre"},
     "HVITRE": {"label":"Hauteur de vitrage"},
     "HREM": {"label":"Hauteur de remplissage"},
     "HVT43": {"label":"Hauteur de vitrage — détail page 43"},
     "HPAR": {"label":"Longueur de parclose de finition"},
-    "CP_IMPOSTE": {"label":"Couvre-joint départ mur avec imposte"},
-    "PM_IMPOSTE": {"label":"Profil départ mur avec imposte"},
+    "CP_IMPOSTE": {"label":"Couvre-joint sur départ mur"},
+    "PM_IMPOSTE": {"label":"Départ mur"},
     "DPOUTRE": {"label":"Longueur de poutre"},
     "L1": {"label":"Lisse 1 — longueur de coupe"},
     "L2": {"label":"Lisse 2 — longueur de coupe"}
@@ -34,6 +36,7 @@
     {"vantail":"single","equation":"ADL = 2 * LP + 3"},
     {"vantail":"single","equation":"LB = LP - 105"},
     {"vantail":"single","equation":"LREM = LB + 19"},
+    {"equation":"LBF = L1"},
     {"vantail":"single","equation":"DSV = EM1"},
     {"vantail":"single","equation":"DPOUTRE = EM - 23"},
     {"vantail":"single","equation":"L1 = DSV - LP - 9"},
@@ -54,12 +57,10 @@
     {"equation":"HREM = H1 - 26"},
     {"equation":"HVT43 = H1 - 28.5"},
     {"equation":"HPAR = HSB + 24"},
-    {"imposte":true,"equation":"CP_IMPOSTE = HSP - HP - 94"},
-    {"imposte":true,"equation":"PM_IMPOSTE = HSP - HP - 29.5"}
+    {"imposte":true,"equation":"CP_IMPOSTE = HSP - SEP - 20 - 38"},
+    {"imposte":true,"equation":"PM_IMPOSTE = HSP - SEP - 18 - 11.5"}
   ],
   "conditions": [
-    {"code":"LP","min":680,"max":1300,"message":"La largeur de porte LP doit être comprise entre 680 et 1 300 mm."},
-    {"code":"LPB","max":1230,"message":"La largeur de porte bois LPB est limitée à 1 230 mm."},
     {"code":"EM","max":3000,"message":"La cote entre montants est limitée à 3 000 mm."},
     {"code":"H","max":3000,"message":"La hauteur de porte indiquée ne doit pas dépasser 3 000 mm."}
   ],
@@ -68,21 +69,19 @@
     {"id":"montant-renforce","profil":"Montant renforcé","quantiteRule":"leafPosts","longueur":"HSP","cas":"tous","note":"Quantités indiquées : 2 en simple vantail, 4 en double vantail."},
     {"id":"montant-passage","profil":"Montant de passage","quantiteRule":"leafPosts","longueur":"HSP","cas":"tous","note":"Quantités indiquées : 2 en simple vantail, 4 en double vantail."},
     {"id":"montant-prepare","profil":"Montant préparé pour l’environnement de pose","quantite":2,"longueur":"HSP","cas":"tous","note":"Toujours 2 montants, quelle que soit la configuration."},
-    {"id":"cj-renforce","profil":"Couvre-joint sur montant renforcé","quantiteRule":"leafPostsBothFaces","longueur":"HSP","cas":"tous","note":"Deux faces par montant."},
-    {"id":"cj-passage","profil":"Couvre-joint sur montant de passage","quantiteRule":"leafPosts","longueur":"HSP","cas":"tous","note":"Un couvre-joint par montant de passage ; même longueur que le montant."},
-    {"id":"cj-prepare","profil":"Couvre-joint sur montant préparé","quantite":4,"longueur":"HSP","cas":"tous","note":"Deux couvre-joints par montant préparé ; deux montants préparés × deux faces."},
-    {"id":"lisse1","profil":"Lisse 1 — lisse aluminium","quantite":null,"longueur":"L1","cas":"imposte","note":"En toute hauteur, cette longueur correspond au couvre-joint / enjoliveur associé à la lisse 1."},
-    {"id":"lisse2","profil":"Lisse 2 — lisse aluminium","quantite":2,"longueur":"L2","cas":"imposte","note":"La lisse 2 remplit le rôle de couvre-joint haut ; deux faces."},
+    {"id":"cj-renforce","profil":"Couvre-joint sur montant renforcé","quantiteRule":"leafPosts","longueur":"HSP","cas":"tous","note":"Un couvre-joint par montant renforcé ; même longueur que le montant."},
+    {"id":"cj-prepare","profil":"Couvre-joint plat 40 mm sur montant préparé","quantite":4,"longueur":"HSP","cas":"tous","note":"Deux couvre-joints par montant préparé ; deux montants préparés × deux faces."},
+    {"id":"lisse1","profil":"Lisse 1 — profil de lisse 127221","quantiteRule":"leafLisses","longueur":"L1","cas":"imposte","note":"En configuration avec imposte : 1 en simple vantail, 2 en double vantail."},
+    {"id":"lisse2","profil":"Lisse 2 — profil de lisse 127221","quantite":1,"longueur":"L2","cas":"imposte","note":"En configuration avec imposte : 1 pièce en simple ou double vantail."},
+    {"id":"cj-haut","profil":"Couvre-joint haut égal à la Lisse 2","quantite":2,"longueur":"L2","cas":"tous","note":"Deux pièces, en toute hauteur comme avec imposte."},
     {"id":"parclose","profil":"Parclose de finition","quantiteRule":"fixedPanels","longueur":"HPAR","cas":"fixed-glazed","note":"1 en simple vantail, 2 en double vantail ; uniquement si les parties fixes sont vitrées."},
-    {"id":"cj-lisse1","profil":"Couvre-joint égal à la lisse 1","quantiteRule":"fixedSectionsBothFaces","longueur":"L1","cas":"sans-imposte","note":"Deux faces pour chaque partie fixe."},
-    {"id":"cj-haut","profil":"Couvre-joint haut égal à la lisse 2","quantite":2,"longueur":"L2","cas":"sans-imposte","note":"Longueur égale à la lisse 2 ; deux faces."},
-    {"id":"enjoliveur","profil":"Enjoliveur égal à la lisse 1","quantiteRule":"fixedSectionsBothFaces","longueur":"L1","cas":"sans-imposte","note":"Deux faces pour chaque partie fixe."},
-    {"id":"cj-mur-imposte","profil":"Couvre-joint au départ mur avec imposte","quantite":2,"longueur":"CP_IMPOSTE","cas":"imposte","note":"Toujours 2 profils avec imposte, quel que soit le type de remplissage."},
-    {"id":"profil-mur-imposte","profil":"Profil de départ mur avec imposte","quantite":2,"longueur":"PM_IMPOSTE","cas":"imposte","note":"Toujours 2 profils avec imposte, quel que soit le type de remplissage."},
-    {"id":"remplissage-fixe","profil":"Profils de la partie fixe","quantite":null,"longueur":null,"cas":"fixed","note":"Il y a 1 partie fixe en simple vantail et 2 en double vantail. Profils, longueurs et quantités par profil à compléter."}
+    {"id":"profil-reception","profil":"Profil de réception","quantite":1,"longueur":"HSP","cas":"simple","note":"Une pièce en simple vantail. Aucun profil de réception en double vantail, d’après la notice."},
+    {"id":"lisse-basse-fixe","profil":"Lisse basse de la partie fixe","quantiteRule":"fixedPanels","longueur":"LBF","cas":"fixed","note":"La notice indique : longueur de lisse basse = Lisse 1."},
+    {"id":"cj-lisse1","profil":"Couvercle de finition — Lisse 1","quantiteRule":"leafLisses","longueur":"L1","cas":"sans-imposte","note":"1 en simple vantail, 2 en double vantail."},
+    {"id":"cj-lisse2","profil":"Couvercle de finition — Lisse 2","quantite":1,"longueur":"L2","cas":"sans-imposte","note":"1 pièce en simple ou double vantail."},
+    {"id":"enjoliveur","profil":"Profil enjoliveur égal à la lisse 1","quantiteRule":"fixedSectionsBothFaces","longueur":"L1","cas":"fixed-glazed","note":"Deux faces pour chaque partie fixe vitrée."},
+    {"id":"cj-mur-imposte","profil":"Couvre-joint sur départ mur","quantite":2,"longueur":"CP_IMPOSTE","cas":"imposte","note":"2 pièces avec imposte : HSP − Sol/entraxe poutre − 20 − 38."},
+    {"id":"profil-mur-imposte","profil":"Départ mur","quantite":2,"longueur":"PM_IMPOSTE","cas":"imposte","note":"2 pièces avec imposte : HSP − Sol/entraxe poutre − 18 − 11,5."}
   ],
-  "alertes": {
-    "single": ["La largeur de porte bois LPB (maximum 1 230 mm) est une condition distincte ; aucune relation de conversion n’a été fournie."],
-    "double": ["La largeur de porte bois LPB (maximum 1 230 mm) est une condition distincte ; aucune relation de conversion n’a été fournie."]
-  }
+  "alertes": {}
 }

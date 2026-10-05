@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { solveRelations } from "../src/formulas.js";
+import { solveRelations, doorWidthWarning } from "../src/formulas.js";
 import { buildCutList } from "../src/cutlist.js";
 
 const simple=[
@@ -32,10 +32,17 @@ test("résout les relations de hauteur et les deux formules de départ mur",()=>
   const got=solveRelations([
     {equation:"H1 - 60 = H - 85"},{equation:"HSB = H1 - 36"},
     {equation:"HPAR = HSB + 24"},{equation:"HVITRE = HSP - 53"},
-    {equation:"CP = HSP - HP - 94"},{equation:"PM = HSP - HP - 29.5"}
-  ],{H:2200,HSP:2800,HP:100});
+    {equation:"CP = HSP - SEP - 20 - 38"},{equation:"PM = HSP - SEP - 18 - 11.5"}
+  ],{H:2200,HSP:2800,SEP:100});
   assert.equal(got.H1,2175);assert.equal(got.HSB,2139);assert.equal(got.HPAR,2163);
-  assert.equal(got.HVITRE,2747);assert.equal(got.CP,2606);assert.equal(got.PM,2670.5);
+  assert.equal(got.HVITRE,2747);assert.equal(got.CP,2642);assert.equal(got.PM,2670.5);
+});
+test("applique la limite de largeur selon le matériau de la porte",()=>{
+  assert.equal(doorWidthWarning(1230,"wood"),null);
+  assert.match(doorWidthWarning(1231,"wood"),/bois.*1 230|bois.*1 230/);
+  assert.equal(doorWidthWarning(1300,"aluminium"),null);
+  assert.match(doorWidthWarning(1301,"aluminium"),/aluminium.*1 300|aluminium.*1 300/);
+  assert.match(doorWidthWarning(679,"aluminium"),/au moins 680/);
 });
 test("quantités de montants, couvre-joints et parties fixes suivent le vantail",()=>{
   const rules=[

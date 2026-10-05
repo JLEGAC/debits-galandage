@@ -4,19 +4,19 @@ PWA installable pour calculer dans les deux sens les cotes d’un galandage et p
 
 ## Données et maintenance
 
-`data/regles-calcul.json` est la source unique des cotes, relations, limites et règles de débit. Pour corriger une formule, modifier l’équation correspondante dans `relations`. Les profils et débits sont décrits dans `debits`. Les quantités dépendant du nombre de vantaux ou des départs mur utilisent un identifiant de règle (`quantiteRule`) traité dans `src/cutlist.js`.
+`data/regles-calcul.json` est la source unique des cotes, relations, limites et règles de débit. Pour corriger une formule, modifier l’équation correspondante dans `relations`. Les profils et débits sont décrits dans `debits`. Les quantités dépendant du nombre de vantaux ou des parties fixes utilisent un identifiant de règle (`quantiteRule`) traité dans `src/cutlist.js`.
 
 Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Quand une quantité ou une longueur n’est pas fournie, la liste affiche « À préciser » plutôt que de supposer une valeur.
 
 ## Formules actuellement intégrées
 
 - Passage libre, entre montants, entraxe minimum, arrêt de lisse, lisse basse minimum et largeur de remplissage.
-- Distances Dsv / Ddv, longueurs des lisses 1 et 2, longueur de poutre.
-- Relations de hauteur de porte, sous poutre, vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte.
-- Conditions connues : LP de 680 à 1 300 mm, LPB jusqu’à 1 230 mm, entre montants jusqu’à 3 000 mm, hauteur de porte jusqu’à 3 000 mm.
-- Quantités connues : 1 poutre ; montants renforcés et de passage (2 ou 4) ; 2 montants préparés ; couvre-joints de passage et de préparation ; départs mur avec imposte (2) ; parcloses (1 ou 2 si les parties fixes sont vitrées).
+- Distances Dsv / Ddv, longueurs des lisses 1 et 2, lisse basse de la partie fixe, longueur de poutre.
+- Relations de hauteur de porte, sous poutre, vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte. Les deux profils de départ mur utilisent la cote saisie « Sol / entraxe poutre ».
+- Conditions connues : largeur LP de 680 à 1 300 mm pour une porte aluminium, jusqu’à 1 230 mm pour une porte bois ; entre montants jusqu’à 3 000 mm ; hauteur de porte jusqu’à 3 000 mm.
+- Quantités connues : 1 poutre ; Lisse 1 (1 ou 2) et Lisse 2 (1) ; couvre-joint haut (2) ; profil de réception (1 en simple vantail, absent en double) ; montants renforcés et de passage (2 ou 4) ; 2 montants préparés ; 1 couvre-joint par montant renforcé et 2 par montant préparé ; aucun couvre-joint sur montant de passage ; 1 ou 2 parties fixes selon le vantail ; départ mur avec imposte (2 profils de chaque type) ; parcloses (1 ou 2 si les parties fixes sont vitrées).
 
-Les règles qui restent à confirmer (quantités des lisses 1 et 2 avec imposte, longueurs de finition en toute hauteur, profils de la partie fixe) restent visibles comme incomplètes dans la liste. Le nombre de parties fixes et de départs mur avec imposte est déduit de la configuration.
+Les profils de la partie fixe sont listés individuellement. Le nombre de parties fixes et de départs mur avec imposte est déduit de la configuration. Une longueur s’affiche dès que les cotes nécessaires sont saisies.
 
 ## Tester
 
