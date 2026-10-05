@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { solveRelations, doorWidthWarning } from "../src/formulas.js";
 import { buildCutList } from "../src/cutlist.js";
+import rules from "../data/regles-calcul.json" with { type: "json" };
 
 const simple=[
   {equation:"PL = LP - 124"},{equation:"EM = 2 * LP - 73"},
@@ -50,6 +51,23 @@ test("résout les relations de hauteur et les deux formules de départ mur",()=>
   ],{H:2200,HSP:2800,SEP:100});
   assert.equal(got.H1,2175);assert.equal(got.HSB,2139);assert.equal(got.HPAR,2163);
   assert.equal(got.HVITRE,2747);assert.equal(got.CP,2642);assert.equal(got.PM,2670.5);
+});
+test("relie HP à H et résout les hauteurs dans les deux sens entre l'axe et le dessous de poutre",()=>{
+  const vertical = rules.relations.filter(rule => !rule.vantail);
+  const fromAxis = solveRelations(vertical,{HSP:2800,SEP:100});
+  assert.equal(fromAxis.HSB,82);
+  assert.equal(fromAxis.HPAR,106);
+  assert.equal(fromAxis.CP_IMPOSTE,2642);
+  assert.equal(fromAxis.PM_IMPOSTE,2670.5);
+  const fromUnderside = solveRelations(vertical,{HSP:2800,HSB:82});
+  assert.equal(fromUnderside.SEP,100);
+  assert.equal(fromUnderside.HPAR,106);
+  assert.equal(fromUnderside.CP_IMPOSTE,2642);
+  assert.equal(fromUnderside.PM_IMPOSTE,2670.5);
+  const fromDoorHeight = solveRelations(vertical,{H:2200});
+  assert.equal(fromDoorHeight.HP,2200);
+  assert.equal(fromDoorHeight.H1,2175);
+  assert.equal(rules.cotes.HP.label,"Hauteur de porte (HP)");
 });
 test("applique la limite de largeur selon le matériau de la porte",()=>{
   assert.equal(doorWidthWarning(1230,"wood"),null);

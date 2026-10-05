@@ -12,7 +12,7 @@ Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Qua
 
 - Passage libre, entre montants, entraxe minimum, arrêt de lisse, lisse basse minimum et largeur de remplissage.
 - Distances EM1 (simple vantail) et EM (double vantail), longueurs des lisses 1 et 2, lisse basse de la partie fixe, longueur de poutre. Dans la notice récente, EM1 remplace Dsv et EM remplace Ddv.
-- Relations de hauteur de porte, sous poutre, vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte. Les deux profils de départ mur utilisent la cote saisie « Sol / entraxe poutre ».
+- Relations de hauteur de porte (`HP = H`), hauteur sous poutre et axe de la poutre (`Sol / entraxe poutre = Hauteur sous poutre + 18`), vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte. Les profils de départ mur utilisent HSP et l’axe de la poutre.
 - Conditions connues : largeur LP de 680 à 1 300 mm pour une porte aluminium, jusqu’à 1 230 mm pour une porte bois ; entre montants jusqu’à 3 000 mm ; hauteur de porte jusqu’à 3 000 mm.
 - Quantités connues : 1 poutre ; Lisse 1 (1 ou 2) et Lisse 2 (1) ; couvre-joint haut (2) ; profil de réception (1 en simple vantail, absent en double) ; montants renforcés et de passage (2 ou 4) ; 2 montants préparés ; 1 couvre-joint par montant renforcé et 2 par montant préparé ; aucun couvre-joint sur montant de passage ; 1 ou 2 parties fixes selon le vantail ; départ mur avec imposte (2 profils de chaque type) ; parcloses (1 ou 2 si les parties fixes sont vitrées).
 

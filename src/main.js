@@ -6,7 +6,7 @@ const $ = id => document.getElementById(id);
 const groups = [
   { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"] },
   { title:"Distances et coupes horizontales", keys:["EM1","L1","L2"] },
-  { title:"Hauteurs", keys:["H","H1","HSP","HP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
+  { title:"Hauteurs", keys:["H","HP","H1","HSP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
 ];
 const state = { doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none", values:{} };
 const numeric = value => {
@@ -22,14 +22,14 @@ function activeRelations() {
 }
 
 function renderInputs() {
-  $("fields").innerHTML = groups.map((group, index) => `
-    <details class="dimension-group" ${index === 0 ? "open" : ""}>
-      <summary>${group.title}</summary>
+  $("fields").innerHTML = groups.map(group => `
+    <section class="dimension-group" aria-label="${group.title}">
+      <h3>${group.title}</h3>
       <div class="fields">${group.keys.map(key => {
         const item = rules.cotes[key];
-        return `<label class="field">${item.label}<span class="input-with-unit"><input inputmode="decimal" type="text" data-cote="${key}" value="${state.values[key] ?? ""}" placeholder="Saisir ou calculer"><small>mm</small></span></label>`;
+        return `<label class="field">${item.label}<span class="input-with-unit"><input inputmode="decimal" type="text" data-cote="${key}" value="${state.values[key] ?? ""}" placeholder="Saisir cette cote"><small>mm</small></span></label>`;
       }).join("")}</div>
-    </details>`).join("");
+    </section>`).join("");
   $("fields").querySelectorAll("input[data-cote]").forEach(input => input.addEventListener("input", () => {
     const value = numeric(input.value);
     if (value === null) delete state.values[input.dataset.cote];
@@ -101,9 +101,8 @@ function calculate() {
   validation.className = `validation${messages.length ? " warning" : ""}`;
   validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
   const horizontal = ["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"];
-  const vertical = ["H","H1","HSP","HP","SEP","HSB","HVITRE","HREM","HVT43","HPAR"];
+  const vertical = ["H","HP","H1","HSP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"];
   horizontal.push("L1","L2");
-  if (state.transom !== "none") vertical.push("CP_IMPOSTE","PM_IMPOSTE");
   horizontal.push("LBF");
   renderValues("horizontal-results", horizontal, solved);
   renderValues("vertical-results", vertical, solved);

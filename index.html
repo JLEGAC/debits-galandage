@@ -35,18 +35,18 @@
     <section class="panel" aria-labelledby="dimensions-title">
       <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes du projet</h2><p>Vous pouvez saisir plusieurs cotes connues. Les résultats sont recalculés automatiquement, quelle que soit la cote de départ.</p></div></div>
       <div id="fields"></div>
+      <div class="calculated-cotes">
+        <h3 class="subheading">Cotes calculées</h3>
+        <p class="hint">Les valeurs se mettent à jour à partir des cotes saisies. Vous pouvez aussi saisir une cote calculée pour repartir de celle-ci.</p>
+        <h4 class="subheading">Largeurs et distances</h4><div id="horizontal-results" class="results-grid"></div>
+        <h4 class="subheading">Hauteurs</h4><div id="vertical-results" class="results-grid"></div>
+      </div>
       <div id="validation" class="validation" role="status" aria-live="polite"></div>
-      <p class="hint">Toutes les valeurs sont en millimètres. Une cote calculée peut aussi être saisie pour démarrer le calcul depuis celle-ci.</p>
-    </section>
-
-    <section class="panel" aria-labelledby="results-title">
-      <div class="section-heading"><span class="step">03</span><div><h2 id="results-title">Cotes calculées</h2><p>Les cotes sont résolues dans les deux sens à partir des valeurs saisies.</p></div></div>
-      <h3 class="subheading">Largeurs et distances</h3><div id="horizontal-results" class="results-grid"></div>
-      <h3 class="subheading">Hauteurs</h3><div id="vertical-results" class="results-grid"></div>
+      <p class="hint">Toutes les valeurs sont en millimètres.</p>
     </section>
 
     <section class="panel" aria-labelledby="cutlist-title">
-      <div class="section-heading"><span class="step">04</span><div><h2 id="cutlist-title">Liste des profils à débiter</h2><p>Quantités et longueurs renseignées à partir des règles disponibles.</p></div></div>
+      <div class="section-heading"><span class="step">03</span><div><h2 id="cutlist-title">Liste des profils à débiter</h2><p>Quantités et longueurs renseignées à partir des règles disponibles.</p></div></div>
       <p id="print-summary" class="print-summary"></p>
       <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>État / règle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
       <div id="cutlist-notice" class="cutlist-notice"></div>
