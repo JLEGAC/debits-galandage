@@ -1,33 +1,41 @@
 # Préparation des débits
 
-PWA paramétrique pour calculer des cotes de galandage à partir des valeurs connues. Les formules sont conservées dans `data/regles-calcul.json` et peuvent être corrigées séparément du moteur.
+PWA installable pour calculer dans les deux sens les cotes d’un galandage et préparer une liste de débits. L’interface est générique et fonctionne localement dans le navigateur ; elle peut être publiée sur GitHub Pages.
 
-## Fonctionnement actuel
+## Données et maintenance
 
-- Calcul bidirectionnel des relations horizontales transcrites dans le fichier de formules.
-- Choix du simple ou double vantail, du remplissage et de l’imposte.
-- Contrôle des cotes saisies incompatibles.
-- L’entraxe minimum en double vantail reste volontairement non calculé tant que la contradiction entre les deux valeurs disponibles n’est pas résolue.
-- La liste des profils, leurs quantités et toutes leurs longueurs de débit restent à compléter avec les règles correspondantes.
-- Impression ou enregistrement en PDF depuis le navigateur.
-- Installation PWA et utilisation hors connexion après le premier chargement.
+`data/regles-calcul.json` est la source unique des cotes, relations, limites et règles de débit. Pour corriger une formule, modifier l’équation correspondante dans `relations`. Les profils et débits sont décrits dans `debits`. Les quantités dépendant du nombre de vantaux ou des départs mur utilisent un identifiant de règle (`quantiteRule`) traité dans `src/cutlist.js`.
 
-## Modifier les formules
+Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Quand une quantité ou une longueur n’est pas fournie, la liste affiche « À préciser » plutôt que de supposer une valeur.
 
-Éditer `data/regles-calcul.json`. Chaque relation est une égalité utilisée dans les deux sens. Le moteur accepte `+`, `-`, `*`, `/` et les parenthèses pour les relations linéaires. Les libellés se trouvent dans `cotes`; les règles dans `relations`.
+## Formules actuellement intégrées
 
-## Lancer localement
+- Passage libre, entre montants, entraxe minimum, arrêt de lisse, lisse basse minimum et largeur de remplissage.
+- Distances Dsv / Ddv, longueurs des lisses 1 et 2 avec imposte, longueur de poutre.
+- Relations de hauteur de porte, sous poutre, vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte.
+- Conditions connues : LP de 680 à 1 300 mm, LPB jusqu’à 1 230 mm, entre montants jusqu’à 3 000 mm, hauteur de porte jusqu’à 3 000 mm.
+- Quantités connues des montants renforcés, de passage et préparés, couvre-joints associés, poutre et profils de départ mur.
 
-Un serveur local ou HTTPS est nécessaire pour le service worker et l’installation :
+Les règles qui restent à confirmer (notamment quantités de certaines lisses et parcloses, couvercles en toute hauteur et profils de la partie fixe) restent visibles comme incomplètes dans la liste.
+
+## Tester
+
+```bash
+npm test
+```
+
+## Lancer en local
+
+Le service worker et l’installation nécessitent localhost ou HTTPS :
 
 ```bash
 python -m http.server 8080
 ```
 
-Ouvrir `http://localhost:8080/preparation-debits/`.
+Ouvrir `http://localhost:8080/`.
 
-## GitHub Pages
+## Publier sur GitHub Pages
 
-Si le contenu du projet est à la racine du dépôt, choisir dans **Settings → Pages** un déploiement depuis la branche `main` et le dossier `/ (root)`.
+Placer le contenu de ce dossier à la racine du dépôt, puis choisir **Settings → Pages → Deploy from a branch → main → /(root)**.
 
-Aucun fichier de licence open source n’est fourni.
+Aucun fichier de licence open source n’est inclus.

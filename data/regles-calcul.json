@@ -1,12 +1,31 @@
 {
-  "version": 1,
+  "version": 2,
+  "unite": "mm",
   "cotes": {
     "LP": {"label":"Largeur de porte"},
     "PL": {"label":"Passage libre"},
-    "EM": {"label":"Entre montants"},
-    "ENTRAXE": {"label":"Entraxe minimum"},
+    "EM": {"label":"Entre montants (cote extérieure)"},
+    "ENTRAXE": {"label":"Entraxe minimum des montants"},
     "ADL": {"label":"Arrêt de lisse"},
-    "LB": {"label":"Lisse basse minimum"}
+    "LB": {"label":"Lisse basse minimum"},
+    "LREM": {"label":"Largeur du remplissage"},
+    "EM1": {"label":"EM1 — distance montant / réception (simple vantail)"},
+    "DSV": {"label":"Dsv — distance simple vantail"},
+    "DDV": {"label":"Ddv — distance double vantail"},
+    "H": {"label":"Hauteur de porte indiquée"},
+    "H1": {"label":"H1 — hauteur de référence"},
+    "HSP": {"label":"Hauteur sous plafond"},
+    "HP": {"label":"Hauteur de poutre"},
+    "HSB": {"label":"Hauteur sous poutre"},
+    "HVITRE": {"label":"Hauteur de vitrage"},
+    "HREM": {"label":"Hauteur de remplissage"},
+    "HVT43": {"label":"Hauteur de vitrage — détail page 43"},
+    "HPAR": {"label":"Longueur de parclose de finition"},
+    "CP_IMPOSTE": {"label":"Couvre-joint départ mur avec imposte"},
+    "PM_IMPOSTE": {"label":"Profil départ mur avec imposte"},
+    "DPOUTRE": {"label":"Longueur de poutre"},
+    "L1": {"label":"Lisse 1 — longueur de coupe"},
+    "L2": {"label":"Lisse 2 — longueur de coupe"}
   },
   "relations": [
     {"vantail":"single","equation":"PL = LP - 124"},
@@ -14,14 +33,56 @@
     {"vantail":"single","equation":"ENTRAXE = 2 * LP - 37"},
     {"vantail":"single","equation":"ADL = 2 * LP + 3"},
     {"vantail":"single","equation":"LB = LP - 105"},
+    {"vantail":"single","equation":"LREM = LB + 19"},
+    {"vantail":"single","equation":"DSV = EM1"},
+    {"vantail":"single","equation":"DPOUTRE = EM - 23"},
+    {"vantail":"single","imposte":true,"equation":"L1 = DSV - LP - 9"},
+    {"vantail":"single","imposte":true,"equation":"L2 = LP - 59"},
     {"vantail":"double","equation":"PL = 2 * LP - 247"},
     {"vantail":"double","equation":"EM = 4 * LP - 177"},
+    {"vantail":"double","equation":"ENTRAXE = 4 * LP - 141"},
     {"vantail":"double","equation":"ADL = 4 * LP - 101"},
-    {"vantail":"double","equation":"LB = LP - 105"}
+    {"vantail":"double","equation":"LB = LP - 105"},
+    {"vantail":"double","equation":"LREM = LB + 19"},
+    {"vantail":"double","equation":"DDV = EM"},
+    {"vantail":"double","equation":"DPOUTRE = EM - 20"},
+    {"vantail":"double","imposte":true,"equation":"L1 = DDV / 2 - LP - 16.2"},
+    {"vantail":"double","imposte":true,"equation":"L2 = 2 * LP - 103"},
+    {"equation":"H1 - 60 = H - 85"},
+    {"equation":"HSB = H1 - 36"},
+    {"equation":"HVITRE = HSP - 53"},
+    {"equation":"HREM = H1 - 26"},
+    {"equation":"HVT43 = H1 - 28.5"},
+    {"equation":"HPAR = HSB + 24"},
+    {"imposte":true,"equation":"CP_IMPOSTE = HSP - HP - 94"},
+    {"imposte":true,"equation":"PM_IMPOSTE = HSP - HP - 29.5"}
+  ],
+  "conditions": [
+    {"code":"LP","min":680,"max":1300,"message":"La largeur de porte LP doit être comprise entre 680 et 1 300 mm."},
+    {"code":"LPB","max":1230,"message":"La largeur de porte bois LPB est limitée à 1 230 mm."},
+    {"code":"EM","max":3000,"message":"La cote entre montants est limitée à 3 000 mm."},
+    {"code":"H","max":3000,"message":"La hauteur de porte indiquée ne doit pas dépasser 3 000 mm."}
+  ],
+  "debits": [
+    {"id":"poutre","profil":"Poutre","quantite":"1","longueur":"DPOUTRE","cas":"tous","note":"Une poutre quelle que soit la configuration."},
+    {"id":"montant-renforce","profil":"Montant renforcé","quantiteRule":"leafPosts","longueur":"HSP","cas":"tous","note":"Quantités indiquées : 2 en simple vantail, 4 en double vantail."},
+    {"id":"montant-passage","profil":"Montant de passage","quantiteRule":"leafPosts","longueur":"HSP","cas":"tous","note":"Quantités indiquées : 2 en simple vantail, 4 en double vantail."},
+    {"id":"montant-prepare","profil":"Montant préparé pour l’environnement de pose","quantite":"2","longueur":"HSP","cas":"tous","note":"Toujours 2 montants, quelle que soit la configuration."},
+    {"id":"cj-renforce","profil":"Couvre-joint sur montant renforcé","quantiteRule":"leafPostsBothFaces","longueur":"HSP","cas":"tous","note":"Deux faces par montant."},
+    {"id":"cj-passage","profil":"Couvre-joint sur montant de passage","quantite":null,"longueur":null,"cas":"tous","note":"Présence et règle de débit à confirmer."},
+    {"id":"cj-prepare","profil":"Couvre-joint sur montant préparé","quantite":"4","longueur":"HSP","cas":"tous","note":"Deux montants préparés × deux faces."},
+    {"id":"lisse1","profil":"Lisse 1 — lisse aluminium","quantite":null,"longueur":"L1","cas":"imposte","note":"Quantité à confirmer. En toute hauteur, la pièce correspond à un couvercle de finition."},
+    {"id":"lisse2","profil":"Lisse 2 — lisse aluminium","quantite":null,"longueur":"L2","cas":"imposte","note":"Quantité à confirmer. En toute hauteur, la pièce correspond à un couvercle de finition."},
+    {"id":"parclose","profil":"Parclose de finition","quantite":null,"longueur":"HPAR","cas":"tous","note":"Longueur connue ; quantité à confirmer."},
+    {"id":"cj-lisse1","profil":"Couvre-joint égal à la lisse 1","quantiteRule":"fixedSectionsBothFaces","longueur":null,"cas":"fixed","note":"Longueur de la lisse 1 à déterminer en configuration toute hauteur."},
+    {"id":"cj-haut","profil":"Couvre-joint haut égal à la lisse 2","quantite":2,"longueur":null,"cas":"sans-imposte","note":"Longueur de la lisse 2 à déterminer en configuration toute hauteur."},
+    {"id":"enjoliveur","profil":"Enjoliveur égal à la lisse 1","quantiteRule":"fixedSectionsBothFaces","longueur":null,"cas":"fixed","note":"Longueur de la lisse 1 à déterminer en configuration toute hauteur."},
+    {"id":"cj-mur-imposte","profil":"Couvre-joint au départ mur avec imposte","quantiteRule":"wallStartsBothFaces","longueur":"CP_IMPOSTE","cas":"imposte","note":"Deux faces par départ mur. Saisir le nombre de départs mur concernés."},
+    {"id":"profil-mur-imposte","profil":"Profil de départ mur avec imposte","quantiteRule":"wallStartsBothFaces","longueur":"PM_IMPOSTE","cas":"imposte","note":"Deux faces par départ mur. Saisir le nombre de départs mur concernés."},
+    {"id":"remplissage-fixe","profil":"Profils de la partie fixe","quantite":null,"longueur":null,"cas":"fixed","note":"Profils, longueurs et quantités à compléter."}
   ],
   "alertes": {
-    "single": [],
-    "double": ["Les deux valeurs disponibles pour l’entraxe minimum en double vantail sont contradictoires (4 × LP - 141 et 4 × LP - 177). Cette cote est laissée non calculée jusqu’à validation." ]
-  },
-  "debits": []
+    "single": ["La largeur de porte bois LPB (maximum 1 230 mm) est une condition distincte ; aucune relation de conversion n’a été fournie."],
+    "double": ["La largeur de porte bois LPB (maximum 1 230 mm) est une condition distincte ; aucune relation de conversion n’a été fournie."]
+  }
 }

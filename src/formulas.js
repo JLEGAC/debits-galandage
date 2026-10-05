@@ -28,6 +28,16 @@ function affine(expression) {
   const result=sum();if(position!==tokens.length)throw Error("La formule contient une syntaxe non reconnue");return result;
 }
 
+export function evaluateExpression(expression, values) {
+  const form = affine(expression);
+  let result = form.c;
+  for (const [name, coefficient] of Object.entries(form.v)) {
+    if (!Number.isFinite(values[name])) return null;
+    result += coefficient * values[name];
+  }
+  return Number.isFinite(result) ? result : null;
+}
+
 export function solveRelations(relations, givens) {
   const names = new Set(Object.keys(givens));
   const rows = relations.map(({ equation }) => {

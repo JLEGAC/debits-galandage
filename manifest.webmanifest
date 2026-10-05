@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Préparation des débits",
   "short_name": "Débits",
-  "description": "Calcul paramétrique des dimensions d’un galandage.",
+  "description": "Calcul bidirectionnel des cotes et préparation des débits d’un galandage.",
   "lang": "fr-FR",
   "start_url": "./",
   "scope": "./",

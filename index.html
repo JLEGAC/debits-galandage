@@ -4,46 +4,65 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#273746">
-  <meta name="description" content="Calcul des cotes d’un galandage à partir des dimensions du projet.">
+  <meta name="description" content="Calcul bidirectionnel des cotes et préparation des débits d’un galandage.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <title>Préparation des débits</title>
 </head>
 <body>
-
-  <main id="accueil">
-    <section class="hero">
-      <p class="eyebrow">CALCUL DES COTES</p>
+  <main>
+    <header class="hero">
+      <p class="eyebrow">OUTIL DE DIMENSIONNEMENT</p>
       <h1>Préparation des débits</h1>
-      <p class="intro">Saisissez les cotes que vous connaissez. Les dimensions reliées par les formules validées se calculent automatiquement.</p>
-    </section>
+      <p class="intro">Saisissez les dimensions connues dans le sens qui vous convient. Les cotes liées se calculent dans les deux sens, puis les débits documentés sont listés.</p>
+    </header>
 
-    <section class="panel configuration" aria-labelledby="configuration-title">
-      <div class="section-heading"><span class="step">01</span><div><h2 id="configuration-title">Configuration</h2><p>Choisissez les caractéristiques de la porte.</p></div></div>
+    <section class="panel" aria-labelledby="config-title">
+      <div class="section-heading"><span class="step">01</span><div><h2 id="config-title">Configuration</h2><p>Choisissez la porte et les options du projet.</p></div></div>
       <div class="option-grid">
-        <label>Vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
-        <label>Remplissage<select id="infill"><option value="glazed">Vitré</option><option value="solid">Plein</option></select></label>
+        <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
+        <label>Remplissage de porte<select id="infill"><option value="glazed">Vitré</option><option value="solid">Plein</option></select></label>
         <label>Imposte<select id="transom"><option value="none">Sans imposte</option><option value="glazed">Imposte vitrée</option><option value="solid">Imposte pleine</option></select></label>
       </div>
+      <div class="option-grid secondary-options">
+        <label>Départs mur avec imposte<input id="wall-starts" type="number" min="0" step="1" value="0"><small>Nombre de départs concernés ; chaque profil est prévu sur les deux faces.</small></label>
+        <label>Parties fixes<input id="fixed-sections" type="number" min="0" step="1" value="0"><small>Nombre de parties fixes dans la cloison.</small></label>
+        <label>Largeur de porte bois LPB <span class="optional">(si applicable)</span><input id="lpb" inputmode="decimal" type="text" placeholder="Saisir en mm"><small>Maximum indiqué : 1 230 mm. Pas de formule de conversion fournie.</small></label>
+      </div>
+      <p class="hint">Le type de remplissage est repris sur le récapitulatif. Aucune différence de formule ou de débit selon le remplissage n’a encore été définie.</p>
     </section>
 
-    <section class="panel dimensions" aria-labelledby="dimensions-title">
-      <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes connues</h2><p>Renseignez une ou plusieurs dimensions du projet, en millimètres.</p></div></div>
-      <div id="fields" class="fields"></div>
-      <p class="hint">Vous pouvez saisir plusieurs cotes. Si elles sont incompatibles entre elles, l’outil vous le signalera.</p>
+    <section class="panel" aria-labelledby="dimensions-title">
+      <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes du projet</h2><p>Vous pouvez saisir plusieurs cotes connues. Les résultats sont recalculés automatiquement, quelle que soit la cote de départ.</p></div></div>
+      <div id="fields"></div>
       <div id="validation" class="validation" role="status" aria-live="polite"></div>
+      <p class="hint">Toutes les valeurs sont en millimètres. Une cote calculée peut aussi être saisie pour démarrer le calcul depuis celle-ci.</p>
     </section>
 
-    <section class="panel results" aria-labelledby="results-title">
-      <div class="section-heading"><span class="step">03</span><div><h2 id="results-title">Dimensions calculées</h2><p>Les cotes issues des relations sont affichées ci-dessous.</p></div></div>
-      <div id="results-grid" class="results-grid"></div>
-      <div class="cutlist-notice"><strong>Liste des profils à débiter</strong><p>Les règles de débit complètes doivent encore être validées avant de pouvoir fournir une liste de coupe fiable. Les profils et formules manquants ne sont pas supposés.</p></div>
+    <section class="panel" aria-labelledby="results-title">
+      <div class="section-heading"><span class="step">03</span><div><h2 id="results-title">Cotes calculées</h2><p>Les cotes sont résolues dans les deux sens à partir des valeurs saisies.</p></div></div>
+      <h3 class="subheading">Largeurs et distances</h3><div id="horizontal-results" class="results-grid"></div>
+      <h3 class="subheading">Hauteurs</h3><div id="vertical-results" class="results-grid"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="cutlist-title">
+      <div class="section-heading"><span class="step">04</span><div><h2 id="cutlist-title">Liste des profils à débiter</h2><p>Quantités et longueurs renseignées à partir des règles disponibles.</p></div></div>
+      <p id="print-summary" class="print-summary"></p>
+      <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>État / règle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
+      <div id="cutlist-notice" class="cutlist-notice"></div>
       <div class="actions"><button id="print" class="button primary" type="button">Imprimer / enregistrer en PDF</button><button id="reset" class="button secondary" type="button">Effacer les cotes</button></div>
     </section>
-    <p class="source-note">Calcul paramétrique de démonstration. Vérifiez les formules et les cotes avant utilisation en fabrication.</p>
+    <section class="panel formula-panel" aria-labelledby="formula-title">
+      <details>
+        <summary id="formula-title">Consulter les relations et limites intégrées</summary>
+        <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
+        <div id="formula-list" class="formula-list"></div>
+      </details>
+    </section>
+    <p class="source-note">Les débits marqués « à préciser » ne sont pas estimés. Vérifiez les dimensions et les formules avant toute fabrication.</p>
   </main>
-  <footer><span>Calculateur paramétrique</span><button id="install" class="install-button" hidden>Installer l’application</button></footer>
+  <footer><span>Calculateur de cotes et de débits</span><button id="install" class="install-button" hidden>Installer l’application</button></footer>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>
