@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { solveRelations, doorWidthWarning } from "../src/formulas.js";
+import { solveRelations, solveRelationGroups, doorWidthWarning } from "../src/formulas.js";
 import { buildCutList } from "../src/cutlist.js";
 import rules from "../data/regles-calcul.json" with { type: "json" };
 
@@ -98,4 +98,23 @@ test("rejette des cotes client incompatibles",()=>{
 });
 test("refuse une relation non linéaire",()=>{
   assert.throws(()=>solveRelations([{equation:"A = B * C"}],{A:12}),/non linéaire/);
+});
+
+test("isole les conflits et conserve le calcul des autres groupes",()=>{
+  const relations=[...simple,{equation:"HSB = SEP - 18"},{equation:"HPAR = HSB + 24"}];
+  const result=solveRelationGroups(relations,{LP:900,PL:777,SEP:100});
+  assert.equal(result.values.HSB,82);
+  assert.equal(result.values.HPAR,106);
+  assert.equal(result.values.LP,900);
+  assert.equal(result.conflicts.length,1);
+  assert.deepEqual(result.conflicts[0].givenKeys.sort(),["LP","PL"]);
+  assert.ok(result.conflicts[0].vars.has("LB"));
+});
+
+test("conserve des résultats calculés visibles en prenant la dernière cote modifiée comme référence",()=>{
+  const result=solveRelationGroups(simple,{LP:900,PL:777},"PL");
+  assert.equal(result.values.LP,901);
+  assert.equal(result.values.EM,1729);
+  assert.equal(result.values.LB,796);
+  assert.equal(result.conflicts[0].givenKeys.length,2);
 });
