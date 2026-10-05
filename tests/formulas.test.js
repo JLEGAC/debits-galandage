@@ -37,19 +37,22 @@ test("résout les relations de hauteur et les deux formules de départ mur",()=>
   assert.equal(got.H1,2175);assert.equal(got.HSB,2139);assert.equal(got.HPAR,2163);
   assert.equal(got.HVITRE,2747);assert.equal(got.CP,2606);assert.equal(got.PM,2670.5);
 });
-test("quantités de montants et couvre-joints suivent le vantail et les deux faces",()=>{
+test("quantités de montants, couvre-joints et parties fixes suivent le vantail",()=>{
   const rules=[
     {id:"renforce",quantiteRule:"leafPosts",longueur:"HSP",cas:"tous"},
-    {id:"cj",quantiteRule:"leafPostsBothFaces",longueur:"HSP",cas:"tous"},
-    {id:"mur",quantiteRule:"wallStartsBothFaces",longueur:"HSP",cas:"imposte"}
+    {id:"passage",quantiteRule:"leafPosts",longueur:"HSP",cas:"tous"},
+    {id:"cj-renforce",quantiteRule:"leafPostsBothFaces",longueur:"HSP",cas:"tous"},
+    {id:"mur",quantite:2,longueur:"HSP",cas:"imposte"},
+    {id:"fixed",quantiteRule:"fixedPanels",longueur:"HSP",cas:"fixed"},
+    {id:"fixed-cj",quantiteRule:"fixedSectionsBothFaces",longueur:"HSP",cas:"fixed"},
+    {id:"parclose",quantiteRule:"fixedPanels",longueur:"HSP",cas:"fixed-glazed"}
   ];
-  const simpleCuts=buildCutList(rules,{leaf:"single",transom:true,wallStarts:2,values:{HSP:2500}});
-  assert.deepEqual(simpleCuts.map(row=>row.quantity),[2,4,4]);
-  const doubleCuts=buildCutList(rules,{leaf:"double",transom:false,wallStarts:0,values:{HSP:2500}});
-  assert.deepEqual(doubleCuts.slice(0,2).map(row=>row.quantity),[4,8]);
-  assert.equal(doubleCuts.length,2);
-  const fixedCuts=buildCutList([{id:"cj",quantiteRule:"fixedSectionsBothFaces",longueur:null,cas:"fixed"}],{leaf:"single",transom:false,fixedSections:3,values:{}});
-  assert.equal(fixedCuts[0].quantity,6);
+  const simpleCuts=buildCutList(rules,{leaf:"single",transom:true,fixedGlazed:true,values:{HSP:2500}});
+  assert.deepEqual(simpleCuts.map(row=>row.quantity),[2,2,4,2,1,2,1]);
+  const doubleCuts=buildCutList(rules,{leaf:"double",transom:false,fixedGlazed:false,values:{HSP:2500}});
+  assert.deepEqual(doubleCuts.map(row=>row.quantity),[4,4,8,2,4]);
+  const solidCuts=buildCutList(rules,{leaf:"single",transom:false,fixedGlazed:false,values:{HSP:2500}});
+  assert.equal(solidCuts.some(row=>row.id==="parclose"),false);
 });
 test("rejette des cotes client incompatibles",()=>{
   assert.throws(()=>solveRelations(simple,{LP:900,PL:777}),/incompatibles/);

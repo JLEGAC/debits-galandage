@@ -8,7 +8,7 @@ const groups = [
   { title:"Distances et coupes horizontales", keys:["EM1","DSV","DDV","L1","L2"] },
   { title:"Hauteurs", keys:["H","H1","HSP","HP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
 ];
-const state = { leaf:"single", infill:"glazed", transom:"none", wallStarts:0, fixedSections:0, values:{} };
+const state = { leaf:"single", infill:"glazed", transom:"none", values:{} };
 const numeric = value => {
   const normalized = String(value).trim().replace(",", ".");
   if (!normalized) return null;
@@ -61,7 +61,7 @@ function renderValues(target, keys, solved) {
 }
 
 function renderCutlist(solved) {
-  const rows = buildCutList(rules.debits, { leaf:state.leaf, transom:state.transom !== "none", wallStarts:state.wallStarts, fixedSections:state.fixedSections, values:solved });
+  const rows = buildCutList(rules.debits, { leaf:state.leaf, transom:state.transom !== "none", fixedGlazed:state.infill === "glazed", values:solved });
   const unknown = rows.filter(row => row.missing.length).length;
   $("cutlist").innerHTML = rows.map(rule => {
     const qText = rule.quantity == null ? "À préciser" : rule.quantity;
@@ -77,7 +77,8 @@ function renderCutlist(solved) {
   const infillLabel = $("infill").selectedOptions[0].textContent;
   const transomLabel = $("transom").selectedOptions[0].textContent;
   const lpb = numeric($("lpb").value);
-  $("print-summary").textContent = `${leafLabel} · Porte ${infillLabel.toLowerCase()} · ${transomLabel}${state.wallStarts ? ` · ${state.wallStarts} départ(s) mur avec imposte` : ""}${state.fixedSections ? ` · ${state.fixedSections} partie(s) fixe(s)` : ""}${Number.isFinite(lpb) ? ` · LPB ${format(lpb)} mm` : ""}`;
+  const fixedCount = state.leaf === "single" ? 1 : 2;
+  $("print-summary").textContent = `${leafLabel} · Parties fixes ${infillLabel.toLowerCase()} (${fixedCount}) · ${transomLabel}${state.transom !== "none" ? " · 2 départs mur avec imposte" : ""}${Number.isFinite(lpb) ? ` · LPB ${format(lpb)} mm` : ""}`;
 }
 
 function renderFormulas() {
@@ -101,7 +102,8 @@ function calculate() {
   validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
   const horizontal = ["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DSV","DDV","DPOUTRE"];
   const vertical = ["H","H1","HSP","HP","HSB","HVITRE","HREM","HVT43","HPAR"];
-  if (state.transom !== "none") { horizontal.push("L1","L2"); vertical.push("CP_IMPOSTE","PM_IMPOSTE"); }
+  horizontal.push("L1","L2");
+  if (state.transom !== "none") vertical.push("CP_IMPOSTE","PM_IMPOSTE");
   renderValues("horizontal-results", horizontal, solved);
   renderValues("vertical-results", vertical, solved);
   renderCutlist(solved);
@@ -110,15 +112,13 @@ function calculate() {
 $("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; calculate(); });
 $("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
-$("wall-starts").addEventListener("input", event => { state.wallStarts = Math.max(0, Number.parseInt(event.target.value, 10) || 0); calculate(); });
-$("fixed-sections").addEventListener("input", event => { state.fixedSections = Math.max(0, Number.parseInt(event.target.value, 10) || 0); calculate(); });
 $("lpb").addEventListener("input", calculate);
 $("print").addEventListener("click", () => window.print());
 $("reset").addEventListener("click", () => {
   state.values = {};
-  state.leaf = "single"; state.infill = "glazed"; state.transom = "none"; state.wallStarts = 0; state.fixedSections = 0;
+  state.leaf = "single"; state.infill = "glazed"; state.transom = "none";
   $("leaf-count").value = state.leaf; $("infill").value = state.infill; $("transom").value = state.transom;
-  $("wall-starts").value = "0"; $("fixed-sections").value = "0"; $("lpb").value = "";
+  $("lpb").value = "";
   renderInputs(); calculate();
 });
 renderInputs();

@@ -11,12 +11,12 @@ Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Qua
 ## Formules actuellement intégrées
 
 - Passage libre, entre montants, entraxe minimum, arrêt de lisse, lisse basse minimum et largeur de remplissage.
-- Distances Dsv / Ddv, longueurs des lisses 1 et 2 avec imposte, longueur de poutre.
+- Distances Dsv / Ddv, longueurs des lisses 1 et 2, longueur de poutre.
 - Relations de hauteur de porte, sous poutre, vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte.
 - Conditions connues : LP de 680 à 1 300 mm, LPB jusqu’à 1 230 mm, entre montants jusqu’à 3 000 mm, hauteur de porte jusqu’à 3 000 mm.
-- Quantités connues des montants renforcés, de passage et préparés, couvre-joints associés, poutre et profils de départ mur.
+- Quantités connues : 1 poutre ; montants renforcés et de passage (2 ou 4) ; 2 montants préparés ; couvre-joints de passage et de préparation ; départs mur avec imposte (2) ; parcloses (1 ou 2 si les parties fixes sont vitrées).
 
-Les règles qui restent à confirmer (notamment quantités de certaines lisses et parcloses, couvercles en toute hauteur et profils de la partie fixe) restent visibles comme incomplètes dans la liste.
+Les règles qui restent à confirmer (quantités des lisses 1 et 2 avec imposte, longueurs de finition en toute hauteur, profils de la partie fixe) restent visibles comme incomplètes dans la liste. Le nombre de parties fixes et de départs mur avec imposte est déduit de la configuration.
 
 ## Tester
 

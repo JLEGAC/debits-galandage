@@ -22,15 +22,14 @@
       <div class="section-heading"><span class="step">01</span><div><h2 id="config-title">Configuration</h2><p>Choisissez la porte et les options du projet.</p></div></div>
       <div class="option-grid">
         <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
-        <label>Remplissage de porte<select id="infill"><option value="glazed">Vitré</option><option value="solid">Plein</option></select></label>
+        <label>Remplissage des parties fixes<select id="infill"><option value="glazed">Vitrées</option><option value="solid">Pleines</option></select></label>
         <label>Imposte<select id="transom"><option value="none">Sans imposte</option><option value="glazed">Imposte vitrée</option><option value="solid">Imposte pleine</option></select></label>
       </div>
       <div class="option-grid secondary-options">
-        <label>Départs mur avec imposte<input id="wall-starts" type="number" min="0" step="1" value="0"><small>Nombre de départs concernés ; chaque profil est prévu sur les deux faces.</small></label>
-        <label>Parties fixes<input id="fixed-sections" type="number" min="0" step="1" value="0"><small>Nombre de parties fixes dans la cloison.</small></label>
+        <p class="derived-note">Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Départs mur avec imposte : 2 profils sur les deux faces.</p>
         <label>Largeur de porte bois LPB <span class="optional">(si applicable)</span><input id="lpb" inputmode="decimal" type="text" placeholder="Saisir en mm"><small>Maximum indiqué : 1 230 mm. Pas de formule de conversion fournie.</small></label>
       </div>
-      <p class="hint">Le type de remplissage est repris sur le récapitulatif. Aucune différence de formule ou de débit selon le remplissage n’a encore été définie.</p>
+      <p class="hint">La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. Aucun autre écart de formule selon le type de remplissage n’a été fourni.</p>
     </section>
 
     <section class="panel" aria-labelledby="dimensions-title">
