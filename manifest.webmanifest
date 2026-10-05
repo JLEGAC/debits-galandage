@@ -1,13 +1,13 @@
 {
   "id": "./",
-  "name": "Calculateur de cotes et de débits",
-  "short_name": "Calculateur",
-  "description": "Calcul paramétrique de cotes et de débits.",
+  "name": "Préparation des débits",
+  "short_name": "Débits",
+  "description": "Calcul paramétrique des dimensions d’un galandage.",
   "lang": "fr-FR",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f6f7",
-  "theme_color": "#334155",
+  "theme_color": "#273746",
   "icons": [{"src":"./assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }

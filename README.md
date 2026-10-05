@@ -1,37 +1,33 @@
-# Calculateur de cotes et de débits
+# Préparation des débits
 
-Application web installable pour calculer des valeurs liées par des formules et, après ajout des règles correspondantes, préparer une liste de débits.
+PWA paramétrique pour calculer des cotes de galandage à partir des valeurs connues. Les formules sont conservées dans `data/regles-calcul.json` et peuvent être corrigées séparément du moteur.
 
-## État du projet
+## Fonctionnement actuel
 
-- Interface mobile-first, installation PWA, cache hors connexion après le premier chargement.
-- Moteur de résolution bidirectionnelle pour les systèmes d’équations linéaires.
-- `data/formules-exemple.json` contient des relations fictives (`A = B + 100`, `C = 2 * B`) uniquement pour démontrer le fonctionnement. Elles ne décrivent aucun produit réel.
-- La liste de débits n’est pas encore implémentée : ajoutez les règles de quantité et de longueur propres à votre projet avant toute utilisation en fabrication.
+- Calcul bidirectionnel des relations horizontales transcrites dans le fichier de formules.
+- Choix du simple ou double vantail, du remplissage et de l’imposte.
+- Contrôle des cotes saisies incompatibles.
+- L’entraxe minimum en double vantail reste volontairement non calculé tant que la contradiction entre les deux valeurs disponibles n’est pas résolue.
+- La liste des profils, leurs quantités et toutes leurs longueurs de débit restent à compléter avec les règles correspondantes.
+- Impression ou enregistrement en PDF depuis le navigateur.
+- Installation PWA et utilisation hors connexion après le premier chargement.
 
 ## Modifier les formules
 
-Éditez `data/formules-exemple.json` :
-
-- `cotes` associe un identifiant court à son libellé visible ;
-- `relations` contient les égalités utilisées dans les deux sens par le moteur.
-
-La syntaxe acceptée est `+`, `-`, `*`, `/` et les parenthèses. Les relations doivent rester linéaires ; les produits entre deux variables ne sont pas pris en charge. Si des équations sont incompatibles, l’application l’indique.
+Éditer `data/regles-calcul.json`. Chaque relation est une égalité utilisée dans les deux sens. Le moteur accepte `+`, `-`, `*`, `/` et les parenthèses pour les relations linéaires. Les libellés se trouvent dans `cotes`; les règles dans `relations`.
 
 ## Lancer localement
 
-Un serveur local ou HTTPS est nécessaire pour le service worker et l’installation PWA :
+Un serveur local ou HTTPS est nécessaire pour le service worker et l’installation :
 
 ```bash
 python -m http.server 8080
 ```
 
-Ouvrez ensuite `http://localhost:8080/calculateur-cotes-debits/`.
+Ouvrir `http://localhost:8080/preparation-debits/`.
 
 ## GitHub Pages
 
-Si le contenu du projet est à la racine du dépôt, choisissez dans **Settings → Pages** un déploiement depuis la branche `main` et le dossier `/ (root)`. Pour publier depuis un sous-dossier, utilisez une GitHub Action adaptée.
+Si le contenu du projet est à la racine du dépôt, choisir dans **Settings → Pages** un déploiement depuis la branche `main` et le dossier `/ (root)`.
 
-## Licence
-
-Aucun fichier de licence open source n’est inclus. Le dépôt public permet la consultation et l’hébergement par GitHub Pages ; les droits d’utilisation du code restent à définir par l’auteur du dépôt.
+Aucun fichier de licence open source n’est fourni.

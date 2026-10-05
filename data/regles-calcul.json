@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "cotes": {
+    "LP": {"label":"Largeur de porte"},
+    "PL": {"label":"Passage libre"},
+    "EM": {"label":"Entre montants"},
+    "ENTRAXE": {"label":"Entraxe minimum"},
+    "ADL": {"label":"Arrêt de lisse"},
+    "LB": {"label":"Lisse basse minimum"}
+  },
+  "relations": [
+    {"vantail":"single","equation":"PL = LP - 124"},
+    {"vantail":"single","equation":"EM = 2 * LP - 73"},
+    {"vantail":"single","equation":"ENTRAXE = 2 * LP - 37"},
+    {"vantail":"single","equation":"ADL = 2 * LP + 3"},
+    {"vantail":"single","equation":"LB = LP - 105"},
+    {"vantail":"double","equation":"PL = 2 * LP - 247"},
+    {"vantail":"double","equation":"EM = 4 * LP - 177"},
+    {"vantail":"double","equation":"ADL = 4 * LP - 101"},
+    {"vantail":"double","equation":"LB = LP - 105"}
+  ],
+  "alertes": {
+    "single": [],
+    "double": ["Les deux valeurs disponibles pour l’entraxe minimum en double vantail sont contradictoires (4 × LP - 141 et 4 × LP - 177). Cette cote est laissée non calculée jusqu’à validation." ]
+  },
+  "debits": []
+}
