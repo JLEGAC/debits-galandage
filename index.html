@@ -26,10 +26,6 @@
         <label>Remplissage des parties fixes<select id="infill"><option value="glazed">Vitrées</option><option value="solid">Pleines</option></select></label>
         <label>Imposte<select id="transom"><option value="none">Sans imposte</option><option value="with">Avec imposte</option></select></label>
       </div>
-      <div class="option-grid secondary-options">
-        <p class="derived-note">Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints et 2 départs mur sont prévus.</p>
-      </div>
-      <p class="hint">La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1 230 mm en bois, 1 300 mm en aluminium.</p>
     </section>
 
     <section class="panel" aria-labelledby="dimensions-title">
@@ -45,7 +41,8 @@
     </section>
     <section class="panel formula-panel" aria-labelledby="formula-title">
       <details>
-        <summary id="formula-title">Consulter les relations et limites intégrées</summary>
+        <summary id="formula-title">Relations et limites</summary>
+        <div class="relation-notes"><p>Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints et 2 départs mur sont prévus.</p><p>La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1 230 mm en bois, 1 300 mm en aluminium.</p></div>
         <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
         <div id="formula-list" class="formula-list"></div>
       </details>
