@@ -16,13 +16,27 @@ test("propage les cotes depuis la largeur de porte",()=>{
 test("retrouve la largeur de porte depuis le passage libre",()=>{
   const got=solveRelations(simple,{PL:776});assert.equal(got.LP,900);assert.equal(got.EM,1727);
 });
+test("utilise EM1 pour le simple vantail et EM pour le double vantail",()=>{
+  const simpleCut=solveRelations([
+    {equation:"EM = 2 * LP - 73"},
+    {equation:"L1 = EM1 - LP - 9"},
+    {equation:"L2 = LP - 59"}
+  ],{LP:900,EM1:1200});
+  assert.equal(simpleCut.EM,1727);assert.equal(simpleCut.L1,291);assert.equal(simpleCut.L2,841);
+  const doubleCut=solveRelations([
+    {equation:"EM = 4 * LP - 177"},
+    {equation:"L1 = EM / 2 - LP - 16.2"},
+    {equation:"L2 = 2 * LP - 103"}
+  ],{LP:900});
+  assert.equal(doubleCut.EM,3423);assert.equal(doubleCut.L1,795.3);assert.equal(doubleCut.L2,1697);
+});
 test("calcule toutes les relations de largeur en double vantail",()=>{
   const got=solveRelations([
     {equation:"PL = 2 * LP - 247"},{equation:"EM = 4 * LP - 177"},
     {equation:"ENTRAXE = 4 * LP - 141"},{equation:"ADL = 4 * LP - 101"},
     {equation:"LB = LP - 105"},{equation:"LREM = LB + 19"},
-    {equation:"DDV = EM"},{equation:"DPOUTRE = EM - 20"},
-    {equation:"L1 = DDV / 2 - LP - 16.2"},{equation:"L2 = 2 * LP - 103"}
+    {equation:"DPOUTRE = EM - 20"},
+    {equation:"L1 = EM / 2 - LP - 16.2"},{equation:"L2 = 2 * LP - 103"}
   ],{LP:900});
   assert.equal(got.PL,1553);assert.equal(got.EM,3423);assert.equal(got.ENTRAXE,3459);
   assert.equal(got.LB,795);assert.equal(got.LREM,814);assert.equal(got.DPOUTRE,3403);

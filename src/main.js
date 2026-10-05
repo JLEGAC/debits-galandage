@@ -5,7 +5,7 @@ import { buildCutList } from "./cutlist.js";
 const $ = id => document.getElementById(id);
 const groups = [
   { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"] },
-  { title:"Distances et coupes horizontales", keys:["EM1","DSV","DDV","L1","L2"] },
+  { title:"Distances et coupes horizontales", keys:["EM1","L1","L2"] },
   { title:"Hauteurs", keys:["H","H1","HSP","HP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
 ];
 const state = { doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none", values:{} };
@@ -100,7 +100,7 @@ function calculate() {
   const validation = $("validation");
   validation.className = `validation${messages.length ? " warning" : ""}`;
   validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
-  const horizontal = ["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DSV","DDV","DPOUTRE"];
+  const horizontal = ["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE"];
   const vertical = ["H","H1","HSP","HP","SEP","HSB","HVITRE","HREM","HVT43","HPAR"];
   horizontal.push("L1","L2");
   if (state.transom !== "none") vertical.push("CP_IMPOSTE","PM_IMPOSTE");
