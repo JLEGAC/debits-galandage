@@ -20,10 +20,13 @@ test("le titre et les textes d’introduction sont simplifiés", () => {
 
 test("la configuration occupe une barre latérale et devient repliable sur petit écran", () => {
   assert.match(html, /<aside class="configuration-sidebar">/);
-  assert.match(html, /<details id="configuration-drawer" class="configuration-drawer">/);
+  assert.match(html, /id="configuration-panel" aria-labelledby="config-title"/);
+  assert.match(html, /id="hide-configuration"/);
+  assert.match(html, /id="show-configuration"[^>]*hidden/);
   assert.match(css, /grid-template-columns: minmax\(225px, 270px\) minmax\(0, 1fr\)/);
-  assert.match(css, /@media \(max-width: 900px\)/);
-  assert.match(css, /\.configuration-drawer > summary \{ display: flex/);
+  assert.match(css, /\.configuration-hidden \.configuration-sidebar \{ display: none/);
+  assert.match(main, /classList\.add\("configuration-hidden"\)/);
+  assert.match(main, /classList\.remove\("configuration-hidden"\)/);
 });
 
 test("les largeurs et les hauteurs sont dans deux panneaux séparés", () => {
@@ -31,13 +34,26 @@ test("les largeurs et les hauteurs sont dans deux panneaux séparés", () => {
   assert.match(html, /id="fields" class="dimension-panels"/);
   assert.match(main, /title:"Largeurs"/);
   assert.match(main, /title:"Hauteurs"/);
+  assert.doesNotMatch(main, /<h3>\$\{group\.title\}<\/h3>/);
   assert.doesNotMatch(html, /id="horizontal-results"|id="vertical-results"/);
+});
+
+test("les libellés correspondent aux noms de cotes validés", () => {
+  const rules = JSON.parse(readFileSync(new URL("../data/regles-calcul.json", import.meta.url), "utf8"));
+  assert.equal(rules.cotes.EM.label, "Cote intérieure entre montants");
+  assert.equal(rules.cotes.ENTRAXE_MIN.label, "Entraxe montants minimum");
+  assert.equal(rules.cotes.LBmini.label, "Lisse Basse");
+  assert.equal(rules.cotes.LHF.label, "Lisse Haute partie Fixe");
+  assert.equal(rules.cotes.LHP.label, "Lisse Haute côté Passage");
+  assert.equal(rules.cotes.LRAIL.label, "Longueur rail");
+  assert.equal(rules.cotes.SEP.label, "Sol / axe rail");
 });
 
 test("la liste des débits a son propre panneau et est repliée au chargement", () => {
   assert.match(html, /<section class="panel cutlist-panel" aria-labelledby="cutlist-title">\s*<details id="cutlist-details">/);
   assert.doesNotMatch(html, /<details id="cutlist-details" open/);
   assert.match(html, /id="cutlist-title">Liste des profils à débiter/);
+  assert.match(css, /\.cutlist-panel details > summary \{ font-size: 14px; \}/);
   assert.match(html, /id="print"/);
   assert.match(html, /id="cutlist"/);
   assert.doesNotMatch(html, /<span class="step">03<\/span>/);

@@ -86,9 +86,9 @@ test("retrouve SEP et les autres cotes à partir de HSR", () => {
 
 test("applique les limites de largeur suivant le matériau de porte", () => {
   assert.equal(doorWidthWarning(1230, "wood"), null);
-  assert.match(doorWidthWarning(1231, "wood"), /bois.*1 230|bois.*1 230/);
+  assert.match(doorWidthWarning(1231, "wood"), /bois.*1\D*230/);
   assert.equal(doorWidthWarning(1300, "aluminium"), null);
-  assert.match(doorWidthWarning(1301, "aluminium"), /aluminium.*1 300|aluminium.*1 300/);
+  assert.match(doorWidthWarning(1301, "aluminium"), /aluminium.*1\D*300/);
   assert.match(doorWidthWarning(679, "aluminium"), /au moins 680/);
 });
 

@@ -31,7 +31,6 @@ function activeRelations() {
 function renderInputs() {
   $("fields").innerHTML = groups.map(group => `
     <section class="panel dimension-panel" aria-label="${group.title}">
-      <h3>${group.title}</h3>
       <div class="fields">${group.keys.filter(key => !rules.cotes[key].vantail || rules.cotes[key].vantail === state.leaf).map(key => {
         const item = rules.cotes[key];
         return `<label class="field">${item.label}<span class="input-with-unit"><span class="origin-indicator" hidden title="Cote calculée à partir des relations" aria-label="Cote calculée">fx</span><input inputmode="decimal" enterkeyhint="next" type="text" data-cote="${key}" placeholder="Saisir cette cote" autocomplete="off"><small>mm</small></span></label>`;
@@ -153,6 +152,18 @@ $("leaf-count").addEventListener("change", event => { state.leaf = event.target.
 $("door-material").addEventListener("change", event => { state.doorMaterial = event.target.value; calculate(); });
 $("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
+$("hide-configuration").addEventListener("click", () => {
+  document.querySelector(".app-layout").classList.add("configuration-hidden");
+  $("hide-configuration").setAttribute("aria-expanded", "false");
+  $("show-configuration").hidden = false;
+  $("show-configuration").setAttribute("aria-expanded", "false");
+});
+$("show-configuration").addEventListener("click", () => {
+  document.querySelector(".app-layout").classList.remove("configuration-hidden");
+  $("hide-configuration").setAttribute("aria-expanded", "true");
+  $("show-configuration").hidden = true;
+  $("show-configuration").setAttribute("aria-expanded", "true");
+});
 $("print").addEventListener("click", () => window.print());
 $("reset").addEventListener("click", () => {
   state.manualValues = {};
