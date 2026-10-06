@@ -4,7 +4,7 @@ import { buildCutList } from "./cutlist.js";
 
 const $ = id => document.getElementById(id);
 const groups = [
-  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE_MIN","ADL","LBmini","LB","LREM","MPR","LHF","LHP","LRAIL"] },
+  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE_MIN","ADL","LB","LREM","MPR","LHF","LHP","LRAIL"] },
   { title:"Hauteurs", keys:["HSP","SEP","HSR","HP","HRF","HRI","HPAR","CJI","DMI"] }
 ];
 const state = {
@@ -152,18 +152,6 @@ $("leaf-count").addEventListener("change", event => { state.leaf = event.target.
 $("door-material").addEventListener("change", event => { state.doorMaterial = event.target.value; calculate(); });
 $("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
-$("hide-configuration").addEventListener("click", () => {
-  document.querySelector(".app-layout").classList.add("configuration-hidden");
-  $("hide-configuration").setAttribute("aria-expanded", "false");
-  $("show-configuration").hidden = false;
-  $("show-configuration").setAttribute("aria-expanded", "false");
-});
-$("show-configuration").addEventListener("click", () => {
-  document.querySelector(".app-layout").classList.remove("configuration-hidden");
-  $("hide-configuration").setAttribute("aria-expanded", "true");
-  $("show-configuration").hidden = true;
-  $("show-configuration").setAttribute("aria-expanded", "true");
-});
 $("print").addEventListener("click", () => window.print());
 $("reset").addEventListener("click", () => {
   state.manualValues = {};

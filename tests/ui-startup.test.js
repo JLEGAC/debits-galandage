@@ -18,15 +18,19 @@ test("le titre et les textes d’introduction sont simplifiés", () => {
   assert.doesNotMatch(html, /Cote saisie|Cote calculée|Saisie en conflit/);
 });
 
-test("la configuration occupe une barre latérale et devient repliable sur petit écran", () => {
-  assert.match(html, /<aside class="configuration-sidebar">/);
-  assert.match(html, /id="configuration-panel" aria-labelledby="config-title"/);
-  assert.match(html, /id="hide-configuration"/);
-  assert.match(html, /id="show-configuration"[^>]*hidden/);
-  assert.match(css, /grid-template-columns: minmax\(225px, 270px\) minmax\(0, 1fr\)/);
-  assert.match(css, /\.configuration-hidden \.configuration-sidebar \{ display: none/);
-  assert.match(main, /classList\.add\("configuration-hidden"\)/);
-  assert.match(main, /classList\.remove\("configuration-hidden"\)/);
+test("la configuration reste visible et le titre s’aligne sur les cotes", () => {
+  assert.match(html, /<div class="app-layout">\s*<header class="hero">/);
+  assert.match(html, /<aside class="configuration-sidebar">\s*<section class="panel configuration" aria-label="Configuration">/);
+  assert.doesNotMatch(html, /Masquer|id="hide-configuration"|id="show-configuration"/);
+  assert.doesNotMatch(main, /configuration-hidden|hide-configuration|show-configuration/);
+  assert.match(css, /grid-template-areas: "\. title" "configuration workspace"/);
+  assert.match(css, /grid-template-areas: "title" "configuration" "workspace"/);
+  assert.doesNotMatch(css, /\.configuration-hidden/);
+});
+
+test("les anciens titres numérotés et le titre du panneau de cotes sont supprimés", () => {
+  assert.doesNotMatch(html, /<span class="step">|<h2 id="config-title">|<h2 id="dimensions-title">/);
+  assert.match(html, /aria-label="Cotes du projet"/);
 });
 
 test("les largeurs et les hauteurs sont dans deux panneaux séparés", () => {
@@ -41,11 +45,17 @@ test("les largeurs et les hauteurs sont dans deux panneaux séparés", () => {
 test("les libellés correspondent aux noms de cotes validés", () => {
   const rules = JSON.parse(readFileSync(new URL("../data/regles-calcul.json", import.meta.url), "utf8"));
   assert.equal(rules.cotes.EM.label, "Cote intérieure entre montants");
-  assert.equal(rules.cotes.ENTRAXE_MIN.label, "Entraxe montants minimum");
-  assert.equal(rules.cotes.LBmini.label, "Lisse Basse");
+  assert.equal(rules.cotes.ENTRAXE_MIN.label, "Entraxe montants mini");
+  assert.equal(rules.cotes.LBmini.label, "Lisse Basse minimum");
+  assert.equal(rules.cotes.LB.label, "Lisse Basse");
   assert.equal(rules.cotes.LHF.label, "Lisse Haute partie Fixe");
   assert.equal(rules.cotes.LHP.label, "Lisse Haute côté Passage");
   assert.equal(rules.cotes.LRAIL.label, "Longueur rail");
+  assert.equal(rules.cotes.HPAR.label, "Hauteur de parclose de finition");
+  assert.equal(rules.cotes.HRF.label, "Hauteur de remplissage partie fixe");
+  assert.equal(rules.cotes.HRI.label, "Hauteur de remplissage imposte");
+  assert.equal(rules.cotes.DMI.label, "Hauteur du départ mur d’imposte");
+  assert.doesNotMatch(main, /"LBmini"/);
   assert.equal(rules.cotes.SEP.label, "Sol / axe rail");
 });
 

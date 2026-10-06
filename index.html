@@ -12,18 +12,12 @@
 </head>
 <body>
   <main>
-    <header class="hero">
-      <h1>Débits porte à galandage</h1>
-    </header>
-
     <div class="app-layout">
+      <header class="hero">
+        <h1>Débits porte à galandage</h1>
+      </header>
       <aside class="configuration-sidebar">
-        <section class="panel configuration" id="configuration-panel" aria-labelledby="config-title">
-          <div class="section-heading configuration-heading">
-            <span class="step">01</span>
-            <h2 id="config-title">Configuration</h2>
-            <button id="hide-configuration" class="config-toggle" type="button" aria-controls="configuration-panel" aria-expanded="true">Masquer</button>
-          </div>
+        <section class="panel configuration" aria-label="Configuration">
           <div class="option-grid">
             <label>Type de porte<select id="door-material"><option value="aluminium">Aluminium</option><option value="wood">Bois</option></select></label>
             <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
@@ -34,12 +28,7 @@
       </aside>
 
       <div class="workspace">
-        <section class="dimensions-area" aria-labelledby="dimensions-title">
-          <div class="section-heading dimensions-heading">
-            <span class="step">02</span>
-            <h2 id="dimensions-title">Cotes du projet</h2>
-            <button id="show-configuration" class="config-toggle" type="button" aria-controls="configuration-panel" aria-expanded="false" hidden>Configuration</button>
-          </div>
+        <section class="dimensions-area" aria-label="Cotes du projet">
           <div id="fields" class="dimension-panels"></div>
           <div id="validation" class="validation" role="status" aria-live="polite"></div>
         </section>
@@ -57,7 +46,7 @@
         <section class="panel formula-panel" aria-labelledby="formula-title">
           <details>
             <summary id="formula-title">Relations et limites</summary>
-            <div class="relation-notes"><p>Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints d’imposte et 2 départs mur sont prévus.</p><p>La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La porte coulisse dans le rail grâce à des chariots. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1230 mm en bois, 1300 mm en aluminium.</p><p>Les identifiants SEP, HSR, LHF, LHP, LBmini, LB, MPR, HRF, CJI et DMI désignent les cotes utilisées dans les relations de calcul.</p></div>
+            <div class="relation-notes"><p>Parties fixes : 1 en simple vantail, 2 en double. Le remplissage de l’imposte suit celui des parties fixes. Avec imposte : 2 couvre-joints et 2 départs mur.</p><p>Parcloses de finition uniquement si les parties fixes sont vitrées. La porte coulisse dans le rail sur des chariots. Largeur maximale : 1230 mm en bois, 1300 mm en aluminium.</p><p>Cotes utilisées : SEP, HSR, LHF, LHP, LB, MPR, HRF, CJI et DMI.</p></div>
             <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
             <div id="formula-list" class="formula-list"></div>
           </details>
