@@ -30,12 +30,18 @@
 
     <section class="panel" aria-labelledby="dimensions-title">
       <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes du projet et préparation des débits</h2><p>Saisissez une ou plusieurs cotes. Les cotes liées et les longueurs de débit se mettent à jour dès la saisie.</p></div></div>
-      <p class="hint live-help">Saisissez une cote dans son champ, même si elle était calculée. Le repère <strong>fx</strong> identifie les valeurs calculées.</p>
+      <p class="hint live-help">Saisissez une cote dans son champ, même si elle était calculée. Les relations se mettent à jour dans les deux sens.</p>
+      <div class="cote-legend live-help" aria-label="Légende des états des cotes">
+        <span><i class="legend-swatch manual"></i>Cote saisie</span>
+        <span><i class="legend-swatch calculated"></i><b>fx</b> Cote calculée</span>
+        <span><i class="legend-swatch input-conflict"></i>Saisie en conflit</span>
+        <span><i class="legend-swatch calculation-conflict"></i>Calcul affecté</span>
+      </div>
       <div id="fields"></div>
       <div id="validation" class="validation" role="status" aria-live="polite"></div>
       <h3 id="cutlist-title" class="subheading">Liste des profils à débiter</h3>
       <p id="print-summary" class="print-summary"></p>
-      <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>État / règle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>Contrôle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
       <div id="cutlist-notice" class="cutlist-notice"></div>
       <div class="actions"><button id="print" class="button primary" type="button">Imprimer / enregistrer en PDF</button><button id="reset" class="button secondary" type="button">Effacer les cotes</button></div>
     </section>

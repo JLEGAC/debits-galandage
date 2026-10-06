@@ -12,7 +12,7 @@ const state = {
   manualValues:{}, manualText:{}, invalidValues:{}, conflicts:[], lastEditedKey:null
 };
 const numeric = value => {
-  const normalized = String(value).trim().replace(",", ".");
+  const normalized = String(value).trim().replace(/[\s\u00a0\u202f]/g, "").replace(",", ".");
   if (!normalized) return null;
   const number = Number(normalized);
   return Number.isFinite(number) ? number : NaN;
@@ -29,7 +29,7 @@ function renderInputs() {
       <h3>${group.title}</h3>
       <div class="fields">${group.keys.map(key => {
         const item = rules.cotes[key];
-        return `<label class="field">${item.label}<span class="input-with-unit"><span class="origin-indicator" hidden title="Cote calculée à partir des relations" aria-label="Cote calculée">fx</span><input inputmode="decimal" type="text" data-cote="${key}" placeholder="Saisir cette cote" autocomplete="off"><small>mm</small></span></label>`;
+        return `<label class="field">${item.label}<span class="input-with-unit"><span class="origin-indicator" hidden title="Cote calculée à partir des relations" aria-label="Cote calculée">fx</span><input inputmode="decimal" enterkeyhint="next" type="text" data-cote="${key}" placeholder="Saisir cette cote" autocomplete="off"><small>mm</small></span></label>`;
       }).join("")}</div>
     </section>`).join("");
   $("fields").querySelectorAll("input[data-cote]").forEach(input => input.addEventListener("input", () => {
@@ -103,7 +103,7 @@ function renderCutlist(solved) {
     const ruleVars = rule.longueur ? [...new Set(rule.longueur.match(/[A-Za-zÀ-ÿ_][\wÀ-ÿ]*/g) || [])] : [];
     const conflict = ruleVars.some(key => state.conflicts.some(item => item.vars.has(key)));
     const lText = rule.length == null ? "À préciser" : `${format(rule.length)} mm`;
-    const status = conflict ? "À vérifier" : rule.missing.length ? `À préciser : ${rule.missing.join(", ")}` : "Calculé";
+    const status = conflict ? "À vérifier" : rule.missing.length ? `À préciser : ${rule.missing.join(", ")}` : "";
     return `<tr class="${conflict ? "conflict-row" : rule.missing.length ? "pending" : ""}"><th scope="row">${rule.profil}<small>${rule.note ?? ""}</small></th><td>${qText}</td><td>${lText}</td><td>${status}</td></tr>`;
   }).join("");
   const message = [
