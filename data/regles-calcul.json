@@ -105,7 +105,11 @@
       "id": "lhf-mpr",
       "vantail": "simple",
       "equation": "LHF = MPR - LP - 9",
-      "imposte": "tous"
+      "imposte": "tous",
+      "utilisations": {
+        "avec": "Lisse haute côté partie fixe",
+        "sans": "Couvercle de finition côté partie fixe"
+      }
     },
     {
       "id": "lb-em",
@@ -117,7 +121,11 @@
       "id": "lhf-em",
       "vantail": "double",
       "equation": "LHF = EM / 2 - LP - 16.2",
-      "imposte": "tous"
+      "imposte": "tous",
+      "utilisations": {
+        "avec": "Lisse haute côté partie fixe",
+        "sans": "Couvercle de finition côté partie fixe"
+      }
     },
     {
       "id": "lrem-lb",
@@ -128,13 +136,21 @@
       "id": "lhp-simple",
       "vantail": "simple",
       "equation": "LHP = LP - 59",
-      "imposte": "tous"
+      "imposte": "tous",
+      "utilisations": {
+        "avec": "Lisse haute côté passage",
+        "sans": "Couvercle de finition côté passage"
+      }
     },
     {
       "id": "lhp-double",
       "vantail": "double",
       "equation": "LHP = 2 * LP - 103",
-      "imposte": "tous"
+      "imposte": "tous",
+      "utilisations": {
+        "avec": "Lisse haute côté passage",
+        "sans": "Couvercle de finition côté passage"
+      }
     },
     {
       "id": "rail-simple",

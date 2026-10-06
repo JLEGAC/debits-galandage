@@ -34,8 +34,10 @@ function conditionSummary(rule) {
 
 function formulaCard(rule, libelles) {
   const resultName = rule.equation.split("=")[0].trim();
+  const usages = rule.utilisations ? `<p class="rule-usage"><strong>Utilisation :</strong> avec imposte, ${escapeHtml(rule.utilisations.avec)} ; sans imposte, ${escapeHtml(rule.utilisations.sans)}.</p>` : "";
   return `<details class="rule-card"><summary><span>${escapeHtml(libelles[resultName] || resultName)}</span><code>${escapeHtml(conditionSummary(rule))}</code></summary>
     <div class="rule-card-content"><div class="rule-conditions">${Object.keys(selectOptions).map(key => conditionSelect(key, rule[key], rule.id)).join("")}</div>
+    ${usages}
     <label class="equation-label">Relation<input class="equation-input" type="text" data-equation="${escapeHtml(rule.id)}" value="${escapeHtml(rule.equation)}" autocomplete="off" spellcheck="false"></label>
     <label class="minimum-rule"><input type="checkbox" data-minimum="${escapeHtml(rule.id)}" ${rule.minimum ? "checked" : ""}> Cette relation définit une cote minimale</label>
     </div></details>`;

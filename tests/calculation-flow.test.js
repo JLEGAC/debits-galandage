@@ -36,3 +36,14 @@ test("chaque relation précise son contexte d’imposte et les règles communes 
   assert.ok(common.some(rule=>rule.id==="lhp-simple"));
   assert.ok(common.some(rule=>rule.id==="lhf-mpr"));
 });
+
+test("les longueurs LHF et LHP indiquent le profil débité selon la présence de l’imposte",()=>{
+  for (const id of ["lhf-mpr", "lhf-em"]) {
+    const rule=rules.relations.find(item=>item.id===id);
+    assert.deepEqual(rule.utilisations,{avec:"Lisse haute côté partie fixe",sans:"Couvercle de finition côté partie fixe"});
+  }
+  for (const id of ["lhp-simple", "lhp-double"]) {
+    const rule=rules.relations.find(item=>item.id===id);
+    assert.deepEqual(rule.utilisations,{avec:"Lisse haute côté passage",sans:"Couvercle de finition côté passage"});
+  }
+});

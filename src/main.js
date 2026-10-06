@@ -64,7 +64,10 @@ function renderCutlist(values, hasConflict) {
   $("print-summary").textContent=`${state.leaf==="simple"?"Simple vantail":"Double vantail"} · ${state.transom==="avec"?"Avec imposte":"Toute hauteur"} · Porte ${state.material} · Parties fixes ${state.infill}`;
 }
 function renderFormulas() {
-  $("formula-list").innerHTML=config.regles.relations.map(rule=>`<div><span>${escapeHtml(rule.id)}</span><code>${escapeHtml(rule.equation)}</code></div>`).join("");
+  $("formula-list").innerHTML=config.regles.relations.map(rule=>{
+    const usages=rule.utilisations?`<small>Avec imposte : ${escapeHtml(rule.utilisations.avec)} · Sans imposte : ${escapeHtml(rule.utilisations.sans)}</small>`:"";
+    return `<div><span>${escapeHtml(rule.id)}</span><code>${escapeHtml(rule.equation)}</code>${usages}</div>`;
+  }).join("");
   $("relation-notes").textContent=`Relations et limites — ${config.regles.limites.map(item=>item.message).join(" ")}`;
 }
 function render() { document.title=config.titre; $("app-title").textContent=config.titre; renderInputs(); renderFormulas(); calculate(); }
