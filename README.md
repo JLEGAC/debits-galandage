@@ -10,13 +10,16 @@ Le moteur résout les relations linéaires dans les deux sens sans `eval()`. Cha
 
 ## Formules actuellement intégrées
 
-- Passage libre, entre montants, entraxe minimum, arrêt de lisse, lisse basse minimum et largeur de remplissage.
-- Distances EM1 (simple vantail) et EM (double vantail), longueurs des lisses 1 et 2, lisse basse de la partie fixe, longueur de poutre. Dans la notice récente, EM1 remplace Dsv et EM remplace Ddv.
-- Relations de hauteur de porte (`HP = H`), hauteur sous poutre et axe de la poutre (`Sol / entraxe poutre = Hauteur sous poutre + 18`), vitrage, remplissage, parclose et profils/couvre-joints de départ mur avec imposte. Les profils de départ mur utilisent HSP et l’axe de la poutre.
-- Conditions connues : largeur LP de 680 à 1 300 mm pour une porte aluminium, jusqu’à 1 230 mm pour une porte bois ; entre montants jusqu’à 3 000 mm ; hauteur de porte jusqu’à 3 000 mm.
-- Quantités connues : 1 poutre ; Lisse 1 (1 ou 2) et Lisse 2 (1) ; couvre-joint haut (2) ; profil de réception (1 en simple vantail, absent en double) ; montants renforcés et de passage (2 ou 4) ; 2 montants préparés ; 1 couvre-joint par montant renforcé et 2 par montant préparé ; aucun couvre-joint sur montant de passage ; 1 ou 2 parties fixes selon le vantail ; départ mur avec imposte (2 profils de chaque type) ; parcloses (1 ou 2 si les parties fixes sont vitrées).
+- Largeurs : passage libre, entre montants, entraxe minimum entre axes des montants, arrêt de lisse, largeur minimale et réelle de lisse basse, largeur de remplissage, MPR, profils hauts côté partie fixe et côté passage, et longueur de coupe du rail.
+- Hauteurs : HSP (hauteur sous plafond), SEP (sol / entraxe du rail), HSR (hauteur sous rail), hauteur de porte, remplissage de la partie fixe et de l’imposte, parclose de finition, couvre-joint d’imposte et départ mur d’imposte.
+- Hauteur de porte : bois = SEP − 55 mm ; aluminium = SEP − 60 mm. En toute hauteur, SEP = HSP − 24,5 mm, donc HP bois = HSP − 79,5 mm et HP aluminium = HSP − 84,5 mm. HSR = SEP − 36 mm et longueur de parclose = HSR + 24 mm.
+- Largeur minimale de lisse basse : LBmini = LP − 105 mm. Longueur réelle LB : simple vantail = MPR − LP − 9 mm ; double vantail = EM / 2 − LP − 16,2 mm. En simple vantail, MPR est une cote à saisir ; aucune relation permettant de la déduire n’a été fournie. Largeur de remplissage de partie fixe = LB + 19 mm.
+- LHF (profil haut côté partie fixe) : simple vantail = MPR − LP − 9 mm ; double vantail = EM / 2 − LP − 16,2 mm. LHP (profil haut côté passage) : simple vantail = LP − 59 mm ; double vantail = 2 × LP − 103 mm. Avec imposte, ces profils sont des lisses ; en toute hauteur, ce sont des couvercles de finition.
+- Avec imposte : remplissage vitré = HSP − SEP − 32 mm ; remplissage plein = HSP − SEP − 24 mm ; CJI = HSP − SEP − 58 mm ; DMI = HSP − SEP − 29,5 mm.
+- Conditions connues : LP de 680 à 1 300 mm pour une porte aluminium, jusqu’à 1 230 mm pour une porte bois ; EM jusqu’à 3 000 mm ; HSP jusqu’à 3 000 mm.
+- Quantités : 1 rail ; montants renforcés et de passage (2 ou 4 selon le nombre de vantaux) ; 2 montants préparés ; un couvre-joint par montant renforcé, deux par montant préparé ; profils hauts côté partie fixe (1 ou 2) et côté passage (1) ; deux couvre-joints hauts ; 1 ou 2 parties fixes ; une lisse basse par partie fixe ; parcloses (1 ou 2 si les parties fixes sont vitrées) ; avec imposte, 2 couvre-joints et 2 départs mur.
 
-Les profils de la partie fixe sont listés individuellement. Le nombre de parties fixes et de départs mur avec imposte est déduit de la configuration. Une longueur s’affiche dès que les cotes nécessaires sont saisies.
+Les cotes du projet, les résultats calculés et la liste des débits restent réunis dans le même panneau. Les expressions et profils sont modifiables dans `data/regles-calcul.json`.
 
 ## Tester
 

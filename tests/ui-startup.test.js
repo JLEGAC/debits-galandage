@@ -25,7 +25,7 @@ test("cotes saisies, cotes calculées et liste de débit sont dans un espace uni
 });
 
 test("l'imposte a seulement un choix présence/absence", () => {
-  assert.match(html, /<select id="transom"><option value="none">Sans imposte<\/option><option value="with">Avec imposte<\/option><\/select>/);
+  assert.match(html, /<select id="transom"><option value="none">Toute hauteur<\/option><option value="with">Avec imposte<\/option><\/select>/);
   assert.doesNotMatch(html, /Imposte vitrée|Imposte pleine/);
 });
 

@@ -24,7 +24,7 @@
         <label>Type de porte<select id="door-material"><option value="aluminium">Aluminium</option><option value="wood">Bois</option></select></label>
         <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
         <label>Remplissage des parties fixes<select id="infill"><option value="glazed">Vitrées</option><option value="solid">Pleines</option></select></label>
-        <label>Imposte<select id="transom"><option value="none">Sans imposte</option><option value="with">Avec imposte</option></select></label>
+        <label>Imposte<select id="transom"><option value="none">Toute hauteur</option><option value="with">Avec imposte</option></select></label>
       </div>
     </section>
 
@@ -48,7 +48,7 @@
     <section class="panel formula-panel" aria-labelledby="formula-title">
       <details>
         <summary id="formula-title">Relations et limites</summary>
-        <div class="relation-notes"><p>Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints et 2 départs mur sont prévus.</p><p>La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1 230 mm en bois, 1 300 mm en aluminium.</p></div>
+        <div class="relation-notes"><p>Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints d’imposte et 2 départs mur sont prévus.</p><p>La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La porte coulisse dans le rail grâce à des chariots. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1 230 mm en bois, 1 300 mm en aluminium.</p><p>Les identifiants SEP, HSR, LHF, LHP, LBmini, LB, MPR, HRF, CJI et DMI désignent les cotes utilisées dans les relations de calcul.</p></div>
         <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
         <div id="formula-list" class="formula-list"></div>
       </details>

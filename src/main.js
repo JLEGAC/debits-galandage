@@ -4,8 +4,8 @@ import { buildCutList } from "./cutlist.js";
 
 const $ = id => document.getElementById(id);
 const groups = [
-  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LB","LREM","DPOUTRE","EM1","L1","L2"] },
-  { title:"Hauteurs", keys:["H","HP","H1","HSP","SEP","HSB","HVITRE","HREM","HVT43","HPAR","CP_IMPOSTE","PM_IMPOSTE"] }
+  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE_MIN","ADL","LBmini","LB","LREM","MPR","LHF","LHP","LRAIL"] },
+  { title:"Hauteurs", keys:["HSP","SEP","HSR","HP","HRF","HRI","HPAR","CJI","DMI"] }
 ];
 const state = {
   doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none",
@@ -20,14 +20,19 @@ const numeric = value => {
 const format = value => Number.isFinite(value) ? Number(value.toFixed(2)).toString().replace(".", ",") : "—";
 
 function activeRelations() {
-  return rules.relations.filter(rule => (!rule.vantail || rule.vantail === state.leaf) && (!rule.imposte || state.transom !== "none"));
+  return rules.relations.filter(rule =>
+    (!rule.vantail || rule.vantail === state.leaf) &&
+    (rule.transom === undefined || rule.transom === (state.transom !== "none")) &&
+    (!rule.material || rule.material === state.doorMaterial) &&
+    (!rule.infill || rule.infill === state.infill)
+  );
 }
 
 function renderInputs() {
   $("fields").innerHTML = groups.map(group => `
     <section class="dimension-group" aria-label="${group.title}">
       <h3>${group.title}</h3>
-      <div class="fields">${group.keys.map(key => {
+      <div class="fields">${group.keys.filter(key => !rules.cotes[key].vantail || rules.cotes[key].vantail === state.leaf).map(key => {
         const item = rules.cotes[key];
         return `<label class="field">${item.label}<span class="input-with-unit"><span class="origin-indicator" hidden title="Cote calculée à partir des relations" aria-label="Cote calculée">fx</span><input inputmode="decimal" enterkeyhint="next" type="text" data-cote="${key}" placeholder="Saisir cette cote" autocomplete="off"><small>mm</small></span></label>`;
       }).join("")}</div>
@@ -124,7 +129,7 @@ function renderCutlist(solved) {
 function renderFormulas() {
   const escape = value => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   $("formula-list").innerHTML = rules.relations.map(rule => {
-    const variant = rule.imposte ? "Avec imposte" : rule.vantail === "single" ? "Simple vantail" : rule.vantail === "double" ? "Double vantail" : "Hauteurs";
+    const variant = rule.transom === true ? (rule.infill === "glazed" ? "Imposte vitrée" : rule.infill === "solid" ? "Imposte pleine" : "Avec imposte") : rule.transom === false ? (rule.material === "wood" ? "Toute hauteur · bois" : rule.material === "aluminium" ? "Toute hauteur · aluminium" : "Toute hauteur") : rule.material ? `Porte ${rule.material === "wood" ? "bois" : "aluminium"}` : rule.vantail === "single" ? "Simple vantail" : rule.vantail === "double" ? "Double vantail" : "Hauteurs";
     return `<div><span>${variant}</span><code>${escape(rule.equation)}</code></div>`;
   }).join("") + rules.conditions.map(rule => `<div><span>Limite</span><code>${escape(rule.message)}</code></div>`).join("");
 }
@@ -144,7 +149,7 @@ function calculate(activeInput = null) {
   renderCutlist(solved);
 }
 
-$("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; calculate(); });
+$("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; renderInputs(); calculate(); });
 $("door-material").addEventListener("change", event => { state.doorMaterial = event.target.value; calculate(); });
 $("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
 $("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
