@@ -30,7 +30,7 @@ function activeRelations() {
 
 function renderInputs() {
   $("fields").innerHTML = groups.map(group => `
-    <section class="dimension-group" aria-label="${group.title}">
+    <section class="panel dimension-panel" aria-label="${group.title}">
       <h3>${group.title}</h3>
       <div class="fields">${group.keys.filter(key => !rules.cotes[key].vantail || rules.cotes[key].vantail === state.leaf).map(key => {
         const item = rules.cotes[key];

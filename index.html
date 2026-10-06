@@ -8,52 +8,56 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
-  <title>Préparation des débits</title>
+  <title>Débits porte à galandage</title>
 </head>
 <body>
   <main>
     <header class="hero">
-      <p class="eyebrow">OUTIL DE DIMENSIONNEMENT</p>
-      <h1>Préparation des débits</h1>
-      <p class="intro">Saisissez les dimensions connues dans le sens qui vous convient. Les cotes liées se calculent dans les deux sens, puis les débits documentés sont listés.</p>
+      <h1>Débits porte à galandage</h1>
     </header>
 
-    <section class="panel configuration" aria-labelledby="config-title">
-      <div class="section-heading"><span class="step">01</span><div><h2 id="config-title">Configuration</h2><p>Choisissez la porte et les options du projet.</p></div></div>
-      <div class="option-grid">
-        <label>Type de porte<select id="door-material"><option value="aluminium">Aluminium</option><option value="wood">Bois</option></select></label>
-        <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
-        <label>Remplissage des parties fixes<select id="infill"><option value="glazed">Vitrées</option><option value="solid">Pleines</option></select></label>
-        <label>Imposte<select id="transom"><option value="none">Toute hauteur</option><option value="with">Avec imposte</option></select></label>
-      </div>
-    </section>
+    <div class="app-layout">
+      <aside class="configuration-sidebar">
+        <details id="configuration-drawer" class="configuration-drawer">
+          <summary><span class="step">01</span><span>Configuration</span></summary>
+          <section class="panel configuration" aria-label="Configuration">
+            <div class="option-grid">
+              <label>Type de porte<select id="door-material"><option value="aluminium">Aluminium</option><option value="wood">Bois</option></select></label>
+              <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
+              <label>Remplissage des parties fixes<select id="infill"><option value="glazed">Vitrées</option><option value="solid">Pleines</option></select></label>
+              <label>Imposte<select id="transom"><option value="none">Toute hauteur</option><option value="with">Avec imposte</option></select></label>
+            </div>
+          </section>
+        </details>
+      </aside>
 
-    <section class="panel" aria-labelledby="dimensions-title">
-      <div class="section-heading"><span class="step">02</span><div><h2 id="dimensions-title">Cotes du projet et préparation des débits</h2><p>Saisissez une ou plusieurs cotes. Les cotes liées et les longueurs de débit se mettent à jour dès la saisie.</p></div></div>
-      <p class="hint live-help">Saisissez une cote dans son champ, même si elle était calculée. Les relations se mettent à jour dans les deux sens.</p>
-      <div class="cote-legend live-help" aria-label="Légende des états des cotes">
-        <span><i class="legend-swatch manual"></i>Cote saisie</span>
-        <span><i class="legend-swatch calculated"></i><b>fx</b> Cote calculée</span>
-        <span><i class="legend-swatch input-conflict"></i>Saisie en conflit</span>
-        <span><i class="legend-swatch calculation-conflict"></i>Calcul affecté</span>
+      <div class="workspace">
+        <section class="dimensions-area" aria-labelledby="dimensions-title">
+          <div class="section-heading dimensions-heading"><span class="step">02</span><h2 id="dimensions-title">Cotes du projet</h2></div>
+          <div id="fields" class="dimension-panels"></div>
+          <div id="validation" class="validation" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="panel cutlist-panel" aria-labelledby="cutlist-title">
+          <details id="cutlist-details">
+            <summary id="cutlist-title">Liste des profils à débiter</summary>
+            <p id="print-summary" class="print-summary"></p>
+            <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>Contrôle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
+            <div id="cutlist-notice" class="cutlist-notice"></div>
+            <div class="actions"><button id="print" class="button primary" type="button">Imprimer / enregistrer en PDF</button><button id="reset" class="button secondary" type="button">Effacer les cotes</button></div>
+          </details>
+        </section>
+
+        <section class="panel formula-panel" aria-labelledby="formula-title">
+          <details>
+            <summary id="formula-title">Relations et limites</summary>
+            <div class="relation-notes"><p>Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints d’imposte et 2 départs mur sont prévus.</p><p>La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La porte coulisse dans le rail grâce à des chariots. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1 230 mm en bois, 1 300 mm en aluminium.</p><p>Les identifiants SEP, HSR, LHF, LHP, LBmini, LB, MPR, HRF, CJI et DMI désignent les cotes utilisées dans les relations de calcul.</p></div>
+            <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
+            <div id="formula-list" class="formula-list"></div>
+          </details>
+        </section>
       </div>
-      <div id="fields"></div>
-      <div id="validation" class="validation" role="status" aria-live="polite"></div>
-      <h3 id="cutlist-title" class="subheading">Liste des profils à débiter</h3>
-      <p id="print-summary" class="print-summary"></p>
-      <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>Contrôle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
-      <div id="cutlist-notice" class="cutlist-notice"></div>
-      <div class="actions"><button id="print" class="button primary" type="button">Imprimer / enregistrer en PDF</button><button id="reset" class="button secondary" type="button">Effacer les cotes</button></div>
-    </section>
-    <section class="panel formula-panel" aria-labelledby="formula-title">
-      <details>
-        <summary id="formula-title">Relations et limites</summary>
-        <div class="relation-notes"><p>Parties fixes prévues automatiquement : 1 en simple vantail, 2 en double vantail. Avec imposte, son remplissage suit celui des parties fixes ; 2 couvre-joints d’imposte et 2 départs mur sont prévus.</p><p>La parclose de finition est ajoutée uniquement si les parties fixes sont vitrées. La porte coulisse dans le rail grâce à des chariots. La largeur de porte se saisit dans « 02 Cotes du projet » : maximum 1 230 mm en bois, 1 300 mm en aluminium.</p><p>Les identifiants SEP, HSR, LHF, LHP, LBmini, LB, MPR, HRF, CJI et DMI désignent les cotes utilisées dans les relations de calcul.</p></div>
-        <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
-        <div id="formula-list" class="formula-list"></div>
-      </details>
-    </section>
-    <p class="source-note">Les débits marqués « à préciser » ne sont pas estimés. Vérifiez les dimensions et les formules avant toute fabrication.</p>
+    </div>
   </main>
   <footer><span>Calculateur de cotes et de débits</span><button id="install" class="install-button" hidden>Installer l’application</button></footer>
   <script type="module" src="./src/main.js"></script>
