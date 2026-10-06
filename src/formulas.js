@@ -41,8 +41,8 @@ export function evaluateExpression(expression, values) {
 export function doorWidthWarning(width, material) {
   if (!Number.isFinite(width)) return null;
   if (width < 680) return "La largeur de porte doit être d’au moins 680 mm.";
-  const limit = material === "wood" ? 1230 : 1300;
-  if (width > limit) return `La largeur de porte ${material === "wood" ? "bois" : "aluminium"} ne doit pas dépasser ${limit.toLocaleString("fr-FR")} mm.`;
+  const limit = material === "bois" || material === "wood" ? 1230 : 1300;
+  if (width > limit) return `La largeur de porte ${limit === 1230 ? "bois" : "aluminium"} ne doit pas dépasser ${limit} mm.`;
   return null;
 }
 
@@ -129,9 +129,27 @@ export function solveRelationGroups(relations, givens, preferredKey = null) {
       }
     }
   }
-  for (const [key, value] of Object.entries(givens)) if (!Object.hasOwn(values, key)) values[key] = value;
+  for (const [key, value] of Object.entries(givens)) values[key] = value;
   return { values, conflicts };
 }
+
+// Affiche la cote mini dans le champ unique « Lisse Basse » tant qu’aucune
+// cote de réservation n’a été fournie pour calculer la longueur réelle.
+export function applyMinimumDimensions(values, manualValues, vantail) {
+  const resolved = { ...values };
+  const reservationKeys = vantail === "simple"
+    ? ["MPR", "LB", "LHF", "LREM"]
+    : ["EM", "ENTRAXE", "LRAIL", "LB", "LHF", "LREM"];
+  const hasReservationInput = reservationKeys.some(key => Object.hasOwn(manualValues, key));
+  if (!hasReservationInput && Number.isFinite(resolved.LBmini)) {
+    resolved.LB = resolved.LBmini;
+    resolved.LHF = resolved.LBmini;
+    resolved.LREM = resolved.LB + 19;
+  }
+  return resolved;
+}
+
+export const applyMinimumLisseBasse = (values, manualValues) => applyMinimumDimensions(values, manualValues, "simple");
 
 function minimalConflict(relations, givens) {
   let keys = Object.keys(givens);

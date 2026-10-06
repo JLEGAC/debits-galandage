@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#273746">
-  <meta name="description" content="Calcul bidirectionnel des cotes et préparation des débits d’un galandage.">
+  <meta name="description" content="Calcul des cotes et préparation des débits d’une porte à galandage.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
@@ -13,48 +13,42 @@
 <body>
   <main>
     <div class="app-layout">
-      <header class="hero">
-        <h1>Débits porte à galandage</h1>
-      </header>
-      <aside class="configuration-sidebar">
-        <section class="panel configuration" aria-label="Configuration">
-          <div class="option-grid">
-            <label>Type de porte<select id="door-material"><option value="aluminium">Aluminium</option><option value="wood">Bois</option></select></label>
-            <label>Nombre de vantaux<select id="leaf-count"><option value="single">Simple vantail</option><option value="double">Double vantail</option></select></label>
-            <label>Remplissage des parties fixes<select id="infill"><option value="glazed">Vitrées</option><option value="solid">Pleines</option></select></label>
-            <label>Imposte<select id="transom"><option value="none">Toute hauteur</option><option value="with">Avec imposte</option></select></label>
-          </div>
-        </section>
-      </aside>
-
+      <header class="hero"><h1 id="app-title">Débits porte à galandage</h1><button id="open-editor" class="button secondary" type="button">Personnaliser</button></header>
+      <aside class="configuration-sidebar"><section class="panel configuration" aria-label="Configuration">
+        <div class="option-grid">
+          <label>Type de porte<select id="door-material"><option value="aluminium">Aluminium</option><option value="bois">Bois</option></select></label>
+          <label>Nombre de vantaux<select id="leaf-count"><option value="simple">Simple vantail</option><option value="double">Double vantail</option></select></label>
+          <label>Remplissage des parties fixes<select id="infill"><option value="vitré">Vitrées</option><option value="plein">Pleines</option></select></label>
+          <label>Configuration<select id="transom"><option value="sans">Toute hauteur</option><option value="avec">Avec imposte</option></select></label>
+        </div>
+      </section></aside>
       <div class="workspace">
-        <section class="dimensions-area" aria-label="Cotes du projet">
-          <div id="fields" class="dimension-panels"></div>
-          <div id="validation" class="validation" role="status" aria-live="polite"></div>
-        </section>
-
-        <section class="panel cutlist-panel" aria-labelledby="cutlist-title">
-          <details id="cutlist-details">
-            <summary id="cutlist-title">Liste des profils à débiter</summary>
-            <p id="print-summary" class="print-summary"></p>
-            <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>Contrôle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
-            <div id="cutlist-notice" class="cutlist-notice"></div>
-            <div class="actions"><button id="print" class="button primary" type="button">Imprimer / enregistrer en PDF</button><button id="reset" class="button secondary" type="button">Effacer les cotes</button></div>
-          </details>
-        </section>
-
-        <section class="panel formula-panel" aria-labelledby="formula-title">
-          <details>
-            <summary id="formula-title">Relations et limites</summary>
-            <div class="relation-notes"><p>Parties fixes : 1 en simple vantail, 2 en double. Le remplissage de l’imposte suit celui des parties fixes. Avec imposte : 2 couvre-joints et 2 départs mur.</p><p>Parcloses de finition uniquement si les parties fixes sont vitrées. La porte coulisse dans le rail sur des chariots. Largeur maximale : 1230 mm en bois, 1300 mm en aluminium.</p><p>Cotes utilisées : SEP, HSR, LHF, LHP, LB, MPR, HRF, CJI et DMI.</p></div>
-            <p class="hint">Les expressions ci-dessous sont également modifiables dans <code>data/regles-calcul.json</code>.</p>
-            <div id="formula-list" class="formula-list"></div>
-          </details>
-        </section>
+        <section class="dimensions-area" aria-label="Cotes du projet"><div id="fields" class="dimension-panels"></div><div id="validation" class="validation" role="status" aria-live="polite"></div></section>
+        <section class="panel cutlist-panel" aria-labelledby="cutlist-title"><details id="cutlist-details">
+          <summary id="cutlist-title">Liste des profils à débiter</summary><p id="print-summary" class="print-summary"></p>
+          <div class="table-wrap"><table><thead><tr><th>Profil</th><th>Qté</th><th>Longueur de débit</th><th>Contrôle</th></tr></thead><tbody id="cutlist"></tbody></table></div>
+          <div id="cutlist-notice" class="cutlist-notice"></div>
+          <div class="actions"><button id="print" class="button primary" type="button">Imprimer / enregistrer en PDF</button><button id="reset" class="button secondary" type="button">Effacer les cotes</button></div>
+        </details></section>
+        <section class="panel formula-panel" aria-labelledby="formula-title"><details><summary id="formula-title">Relations et limites</summary><p id="relation-notes" class="relation-notes"></p><div id="formula-list" class="formula-list"></div></details></section>
       </div>
     </div>
   </main>
   <footer><span>Calculateur de cotes et de débits</span><button id="install" class="install-button" hidden>Installer l’application</button></footer>
+
+  <dialog id="editor-dialog" class="editor-dialog" aria-labelledby="editor-heading">
+    <div class="editor-shell"><header class="editor-header"><div><p class="eyebrow">PERSONNALISATION LOCALE</p><h2 id="editor-heading">Modifier l’outil</h2><p id="editor-status" class="editor-status"></p></div><button id="close-editor" class="icon-button" type="button" aria-label="Fermer">×</button></header>
+      <div class="editor-scroll"><p class="editor-intro">Les changements sont enregistrés sur cet appareil. Exportez une configuration pour la transférer vers un autre navigateur.</p>
+        <section class="editor-section"><h3>Titre</h3><label class="wide-label">Titre de l’outil<input id="editor-title" type="text" maxlength="80"></label></section>
+        <section class="editor-section"><h3>Libellés des cotes</h3><div id="dimension-label-editor" class="label-grid"></div></section>
+        <section class="editor-section"><h3>Noms des profils</h3><div id="profile-label-editor" class="label-grid"></div></section>
+        <section class="editor-section"><h3>Relations de calcul</h3><p class="hint">Les expressions prises en charge sont linéaires et se calculent dans les deux sens. Les conditions se choisissent dans les listes.</p><div id="equation-editor"></div></section>
+        <section class="editor-section"><h3>Tester une relation</h3><div id="relation-tester"></div></section>
+        <section class="editor-section import-export"><h3>Transférer ou restaurer</h3><div class="actions"><button id="export-editor" class="button secondary" type="button">Exporter JSON</button><button id="import-editor" class="button secondary" type="button">Importer JSON</button><button id="restore-editor" class="button secondary" type="button">Restaurer l’origine</button><input id="import-file" type="file" accept="application/json,.json" hidden></div></section>
+      </div>
+      <footer class="editor-footer"><div id="editor-feedback" class="editor-feedback" role="status" aria-live="polite"></div><div class="actions"><button id="save-editor" class="button primary" type="button">Enregistrer sur cet appareil</button><button id="close-editor-bottom" class="button secondary" type="button">Fermer</button></div></footer>
+    </div>
+  </dialog>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

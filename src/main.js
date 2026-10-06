@@ -1,173 +1,101 @@
-import rules from "../data/regles-calcul.json" with { type: "json" };
-import { solveRelationGroups, doorWidthWarning } from "./formulas.js";
+import defaults from "../data/regles-calcul.json" with { type: "json" };
+import { calculerProjet } from "./calculation.js";
 import { buildCutList } from "./cutlist.js";
+import { initializeSettingsEditor } from "./settings-editor.js";
+import { loadLocalConfiguration, saveLocalConfiguration, removeLocalConfiguration } from "./settings-store.js";
+import { validateConfiguration, makeExportConfiguration, clone } from "./configuration.js";
 
 const $ = id => document.getElementById(id);
-const groups = [
-  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE_MIN","ADL","LB","LREM","MPR","LHF","LHP","LRAIL"] },
+const state = { material:"aluminium", leaf:"simple", infill:"vitré", transom:"sans", manualValues:{}, preferredKey:null, deferredInstall:null };
+let config = { titre:defaults.titre, regles:clone(defaults) };
+const fieldGroups = [
+  { title:"Largeurs", keys:["LP","PL","EM","ENTRAXE","ADL","LBmini","LB","LREM","MPR","LHF","LHP","LRAIL"] },
   { title:"Hauteurs", keys:["HSP","SEP","HSR","HP","HRF","HRI","HPAR","CJI","DMI"] }
 ];
-const state = {
-  doorMaterial:"aluminium", leaf:"single", infill:"glazed", transom:"none",
-  manualValues:{}, manualText:{}, invalidValues:{}, conflicts:[], lastEditedKey:null
-};
-const numeric = value => {
-  const normalized = String(value).trim().replace(/[\s\u00a0\u202f]/g, "").replace(",", ".");
-  if (!normalized) return null;
-  const number = Number(normalized);
-  return Number.isFinite(number) ? number : NaN;
-};
-const format = value => Number.isFinite(value) ? Number(value.toFixed(2)).toString().replace(".", ",") : "—";
+const escapeHtml = value => String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+const normalizeNumber = value => { const text=String(value).trim().replace(/[\s\u00a0\u202f]/g, "").replace(",", "."); if (!text) return null; const valueNumber = Number(text); return Number.isFinite(valueNumber) ? valueNumber : NaN; };
+const formatNumber = value => Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2))).replace(".",",");
+const measureText = (()=>{const canvas=document.createElement("canvas");return value=>{const input=document.querySelector(".input-with-unit input");const context=canvas.getContext("2d");if(!input||!context)return String(value).length*8;context.font=getComputedStyle(input).font;return context.measureText(String(value)).width;};})();
 
-function activeRelations() {
-  return rules.relations.filter(rule =>
-    (!rule.vantail || rule.vantail === state.leaf) &&
-    (rule.transom === undefined || rule.transom === (state.transom !== "none")) &&
-    (!rule.material || rule.material === state.doorMaterial) &&
-    (!rule.infill || rule.infill === state.infill)
-  );
+function currentOptions() { return { materiau:state.material, vantail:state.leaf, remplissage:state.infill, imposte:state.transom }; }
+function visibleKeys() {
+  return Object.keys(config.regles.libelles).filter(key => key !== "MPR" || config.regles.visibiliteCotes?.MPR?.vantail !== "simple" || state.leaf === "simple");
 }
-
 function renderInputs() {
-  $("fields").innerHTML = groups.map(group => `
-    <section class="panel dimension-panel" aria-label="${group.title}">
-      <div class="fields">${group.keys.filter(key => !rules.cotes[key].vantail || rules.cotes[key].vantail === state.leaf).map(key => {
-        const item = rules.cotes[key];
-        return `<label class="field">${item.label}<span class="input-with-unit"><span class="origin-indicator" hidden title="Cote calculée à partir des relations" aria-label="Cote calculée">fx</span><input inputmode="decimal" enterkeyhint="next" type="text" data-cote="${key}" placeholder="Saisir cette cote" autocomplete="off"><small>mm</small></span></label>`;
-      }).join("")}</div>
-    </section>`).join("");
-  $("fields").querySelectorAll("input[data-cote]").forEach(input => input.addEventListener("input", () => {
-    const key = input.dataset.cote;
-    const raw = input.value;
-    const value = numeric(raw);
-    state.lastEditedKey = key;
-    if (value === null) {
-      delete state.manualValues[key];
-      delete state.manualText[key];
-      delete state.invalidValues[key];
-    } else if (Number.isFinite(value)) {
-      state.manualValues[key] = value;
-      state.manualText[key] = raw;
-      delete state.invalidValues[key];
-    } else {
-      delete state.manualValues[key];
-      delete state.manualText[key];
-      state.invalidValues[key] = raw;
-    }
-    calculate(input);
-  }));
-  $("fields").querySelectorAll("input[data-cote]").forEach(input => input.addEventListener("blur", () => calculate()));
-}
-
-function relationWarnings(solved) {
-  const errors = [];
-  for (const condition of rules.conditions) {
-    if (!Number.isFinite(solved[condition.code])) continue;
-    const value = solved[condition.code];
-    if (condition.min != null && value < condition.min || condition.max != null && value > condition.max) errors.push(condition.message);
-  }
-  const widthWarning = doorWidthWarning(solved.LP, state.doorMaterial);
-  if (widthWarning) errors.push(widthWarning);
-  return [...new Set(errors)];
-}
-
-function renderCoteFields(solved, activeInput) {
-  const conflictKeys = new Set(state.conflicts.flatMap(conflict => conflict.givenKeys));
-  const affectedKeys = new Set(state.conflicts.flatMap(conflict => [...conflict.vars]));
-  document.querySelectorAll("input[data-cote]").forEach(input => {
-    const key = input.dataset.cote;
-    const indicator = input.parentElement.querySelector(".origin-indicator");
-    const isManual = Object.hasOwn(state.manualValues, key);
-    const isInvalid = Object.hasOwn(state.invalidValues, key);
-    const isConflict = isManual && conflictKeys.has(key);
-    const isAffected = !isManual && affectedKeys.has(key);
-    const isCalculated = input !== activeInput && !isManual && !isInvalid && Number.isFinite(solved[key]);
-    input.classList.toggle("is-invalid", isInvalid);
-    input.classList.toggle("is-input-conflict", isConflict);
-    input.parentElement.classList.toggle("is-calculated", isCalculated);
-    input.parentElement.classList.toggle("has-input-conflict", isConflict);
-    input.parentElement.classList.toggle("has-calculation-conflict", isAffected);
-    indicator.hidden = !isCalculated;
-    if (input === activeInput) return;
-    if (isInvalid) input.value = state.invalidValues[key];
-    else if (isManual) input.value = state.manualText[key] ?? format(state.manualValues[key]);
-    else input.value = isCalculated ? format(solved[key]) : "";
-  });
-}
-
-function renderCutlist(solved) {
-  const rows = buildCutList(rules.debits, { leaf:state.leaf, transom:state.transom !== "none", fixedGlazed:state.infill === "glazed", values:solved });
-  const unknown = rows.filter(row => row.missing.length).length;
-  const conflictCount = rows.filter(row => {
-    const variables = row.longueur ? row.longueur.match(/[A-Za-zÀ-ÿ_][\wÀ-ÿ]*/g) || [] : [];
-    return variables.some(key => state.conflicts.some(item => item.vars.has(key)));
-  }).length;
-  $("cutlist").innerHTML = rows.map(rule => {
-    const qText = rule.quantity == null ? "À préciser" : rule.quantity;
-    const ruleVars = rule.longueur ? [...new Set(rule.longueur.match(/[A-Za-zÀ-ÿ_][\wÀ-ÿ]*/g) || [])] : [];
-    const conflict = ruleVars.some(key => state.conflicts.some(item => item.vars.has(key)));
-    const lText = rule.length == null ? "À préciser" : `${format(rule.length)} mm`;
-    const status = conflict ? "À vérifier" : rule.missing.length ? `À préciser : ${rule.missing.join(", ")}` : "";
-    return `<tr class="${conflict ? "conflict-row" : rule.missing.length ? "pending" : ""}"><th scope="row">${rule.profil}<small>${rule.note ?? ""}</small></th><td>${qText}</td><td>${lText}</td><td>${status}</td></tr>`;
+  const available = new Set(visibleKeys());
+  $("fields").innerHTML = fieldGroups.map(group => {
+    const keys = group.keys.filter(key => available.has(key));
+    return `<section class="panel dimension-panel" aria-label="${escapeHtml(group.title)}"><div class="fields">${keys.map(key => `<label class="field" for="dimension-${key}"><span>${escapeHtml(config.regles.libelles[key])}</span><span class="input-with-unit" data-wrap="${key}"><span class="origin-indicator" data-origin="${key}" hidden>fx</span><input id="dimension-${key}" data-key="${key}" inputmode="decimal" enterkeyhint="next" autocomplete="off"><small class="minimum-indicator" data-minimum="${key}" hidden>(mini)</small><small class="unit">mm</small></span></label>`).join("")}</div></section>`;
   }).join("");
-  const message = [
-    unknown ? `<strong>Liste partielle : ${unknown} ligne(s) restent à préciser.</strong><p>Les lignes incomplètes sont gardées visibles pour repérer les règles ou données qui manquent. Elles ne sont pas remplacées par des hypothèses.</p>` : "",
-    conflictCount ? `<p>${conflictCount} ligne(s) de débit sont liées à des cotes saisies en conflit ; les longueurs restent affichées et sont à vérifier.</p>` : "",
-    !unknown && !conflictCount ? `<strong>Les profils affichés ont une quantité et une longueur calculées.</strong><p>Contrôlez les cotes et options avant la préparation de la fabrication.</p>` : ""
-  ].filter(Boolean).join("");
-  const receiverNote = state.leaf === "double" ? "<p>En double vantail, la notice ne prévoit pas de profil de réception.</p>" : "";
-  $("cutlist-notice").innerHTML = message + receiverNote;
-  const leafLabel = state.leaf === "single" ? "Simple vantail" : "Double vantail";
-  const infillLabel = $("infill").selectedOptions[0].textContent;
-  const transomLabel = $("transom").selectedOptions[0].textContent;
-  const fixedCount = state.leaf === "single" ? 1 : 2;
-  const materialLabel = state.doorMaterial === "wood" ? "Porte bois" : "Porte aluminium";
-  $("print-summary").textContent = `${materialLabel} · ${leafLabel} · Parties fixes ${infillLabel.toLowerCase()} (${fixedCount}) · ${transomLabel}${state.transom !== "none" ? " · 2 départs mur" : ""}`;
+  $("fields").querySelectorAll("input[data-key]").forEach(input => input.addEventListener("input", () => {
+    const key=input.dataset.key, number=normalizeNumber(input.value);
+    if(number === null) delete state.manualValues[key]; else if(Number.isFinite(number)) state.manualValues[key]=number;
+    state.preferredKey=key; calculate();
+  }));
 }
-
+function calculate() {
+  const result=calculerProjet(config.regles,currentOptions(),state.manualValues,state.preferredKey);
+  const visible = new Set(visibleKeys());
+  const conflicts = result.conflicts.flatMap(item => item.givenKeys);
+  for (const key of Object.keys(config.regles.libelles)) {
+    const input=document.querySelector(`[data-key="${key}"]`); if(!input)continue;
+    const value=result.values[key];
+    if(!Object.hasOwn(state.manualValues,key)) input.value=Number.isFinite(value)?formatNumber(value):"";
+    const wrap=document.querySelector(`[data-wrap="${key}"]`);
+    const calculated=Number.isFinite(value)&&!Object.hasOwn(state.manualValues,key);
+    wrap.classList.toggle("is-calculated",calculated);
+    wrap.classList.toggle("has-input-conflict",conflicts.includes(key));
+    const affected=result.conflicts.some(item=>item.vars.has(key));
+    wrap.classList.toggle("has-calculation-conflict",affected&&!conflicts.includes(key));
+    const origin=document.querySelector(`[data-origin="${key}"]`); if(origin)origin.hidden=!calculated;
+    const mini=document.querySelector(`[data-minimum="${key}"]`); if(mini) mini.hidden=!result.minimumKeys.has(key)||!calculated;
+    if(mini&&!mini.hidden) mini.style.left=`${Math.ceil(40+measureText(input.value))}px`;
+    input.setAttribute("aria-invalid",String(conflicts.includes(key)||affected));
+  }
+  const warnings=[...result.warnings];
+  $("validation").innerHTML=[...result.conflicts.map(()=>"<p>Des cotes saisies sont incompatibles avec les relations sélectionnées.</p>"),...warnings.map(message=>`<p>${escapeHtml(message)}</p>`)].join("");
+  renderCutlist(result.values,result.conflicts.length>0);
+  return result;
+}
+function renderCutlist(values, hasConflict) {
+  const rows=buildCutList(config.regles.debits,{leaf:state.leaf,transom:state.transom==="avec",fixedGlazed:state.infill==="vitré",values});
+  $("cutlist").innerHTML=rows.map(row=>`<tr class="${row.missing.length?"pending":""} ${hasConflict?"conflict-row":""}"><th scope="row">${escapeHtml(row.profil)}${row.note?`<small>${escapeHtml(row.note)}</small>`:""}</th><td>${row.quantity??"—"}</td><td>${row.length==null?"—":`${formatNumber(row.length)} mm`}</td><td>${row.missing.length?`À préciser : ${row.missing.join(", ")}`:hasConflict?"À vérifier":"Prêt"}</td></tr>`).join("");
+  $("cutlist-notice").innerHTML=rows.some(row=>row.missing.length)?"<strong>Formules ou quantités à compléter</strong><p>Certains profils restent sans longueur calculable avec les cotes saisies.</p>":"";
+  $("print-summary").textContent=`${state.leaf==="simple"?"Simple vantail":"Double vantail"} · ${state.transom==="avec"?"Avec imposte":"Toute hauteur"} · Porte ${state.material} · Parties fixes ${state.infill}`;
+}
 function renderFormulas() {
-  const escape = value => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  $("formula-list").innerHTML = rules.relations.map(rule => {
-    const variant = rule.transom === true ? (rule.infill === "glazed" ? "Imposte vitrée" : rule.infill === "solid" ? "Imposte pleine" : "Avec imposte") : rule.transom === false ? (rule.material === "wood" ? "Toute hauteur · bois" : rule.material === "aluminium" ? "Toute hauteur · aluminium" : "Toute hauteur") : rule.material ? `Porte ${rule.material === "wood" ? "bois" : "aluminium"}` : rule.vantail === "single" ? "Simple vantail" : rule.vantail === "double" ? "Double vantail" : "Hauteurs";
-    return `<div><span>${variant}</span><code>${escape(rule.equation)}</code></div>`;
-  }).join("") + rules.conditions.map(rule => `<div><span>Limite</span><code>${escape(rule.message)}</code></div>`).join("");
+  $("formula-list").innerHTML=config.regles.relations.map(rule=>`<div><span>${escapeHtml(rule.id)}</span><code>${escapeHtml(rule.equation)}</code></div>`).join("");
+  $("relation-notes").textContent=`Relations et limites — ${config.regles.limites.map(item=>item.message).join(" ")}`;
 }
-
-function calculate(activeInput = null) {
-  const messages = [];
-  for (const key of Object.keys(state.invalidValues)) messages.push(`La cote « ${rules.cotes[key].label} » doit être un nombre.`);
-  const preferredKey = activeInput?.dataset.cote ?? state.lastEditedKey;
-  const result = solveRelationGroups(activeRelations(), state.manualValues, preferredKey);
-  state.conflicts = result.conflicts;
-  const solved = result.values;
-  messages.push(...relationWarnings(solved));
-  renderCoteFields(solved, activeInput);
-  const validation = $("validation");
-  validation.className = `validation${messages.length ? " warning" : ""}`;
-  validation.innerHTML = messages.map(message => `<p>${message}</p>`).join("");
-  renderCutlist(solved);
-}
-
-$("leaf-count").addEventListener("change", event => { state.leaf = event.target.value; renderInputs(); calculate(); });
-$("door-material").addEventListener("change", event => { state.doorMaterial = event.target.value; calculate(); });
-$("infill").addEventListener("change", event => { state.infill = event.target.value; calculate(); });
-$("transom").addEventListener("change", event => { state.transom = event.target.value; calculate(); });
-$("print").addEventListener("click", () => window.print());
-$("reset").addEventListener("click", () => {
-  state.manualValues = {};
-  state.manualText = {};
-  state.invalidValues = {};
-  state.lastEditedKey = null;
-  state.doorMaterial = "aluminium"; state.leaf = "single"; state.infill = "glazed"; state.transom = "none";
-  $("door-material").value = state.doorMaterial;
-  $("leaf-count").value = state.leaf; $("infill").value = state.infill; $("transom").value = state.transom;
+function render() { document.title=config.titre; $("app-title").textContent=config.titre; renderInputs(); renderFormulas(); calculate(); }
+function refreshConfiguration() {
+  state.material=$("door-material").value; state.leaf=$("leaf-count").value; state.infill=$("infill").value; state.transom=$("transom").value;
+  const visible=new Set(visibleKeys());
+  for(const key of Object.keys(state.manualValues)) if(!visible.has(key)) delete state.manualValues[key];
   renderInputs(); calculate();
-});
-renderInputs();
-renderFormulas();
-calculate();
+}
+function clearDimensions() { state.manualValues={}; state.preferredKey=null; renderInputs(); calculate(); }
+function syncEditorStatus(customized) { $("open-editor").setAttribute("aria-label",customized?"Personnalisation enregistrée":"Personnaliser l’outil"); }
 
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));
-let installEvent;
-window.addEventListener("beforeinstallprompt", event => { event.preventDefault(); installEvent = event; $("install").hidden = false; });
-$("install").addEventListener("click", async () => { if (installEvent) { await installEvent.prompt(); installEvent = null; $("install").hidden = true; } });
+initializeSettingsEditor({
+  getConfig:()=>config,
+  getDefaults:()=>({ titre:defaults.titre,regles:clone(defaults) }),
+  isCustomized:()=>Boolean(window.localStorage.getItem("preparation-debits-customized")),
+  onApply:async next=>{ config=next; await saveLocalConfiguration(makeExportConfiguration(config)); localStorage.setItem("preparation-debits-customized","1"); syncEditorStatus(true); render(); },
+  onRestore:async()=>{ await removeLocalConfiguration(); localStorage.removeItem("preparation-debits-customized"); config={titre:defaults.titre,regles:clone(defaults)}; syncEditorStatus(false); render(); }
+});
+
+for(const id of ["door-material","leaf-count","infill","transom"]) $(id).addEventListener("change",refreshConfiguration);
+$("reset").addEventListener("click",clearDimensions);
+$("print").addEventListener("click",()=>{ const details=$("cutlist-details"); details.open=true; window.print(); });
+window.addEventListener("afterprint",()=>{ $("cutlist-details").open=false; });
+window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();state.deferredInstall=event;$("install").hidden=false;});
+$("install").addEventListener("click",async()=>{if(!state.deferredInstall)return;state.deferredInstall.prompt();await state.deferredInstall.userChoice;state.deferredInstall=null;$("install").hidden=true;});
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
+
+try {
+  const saved=await loadLocalConfiguration();
+  if(saved) { config=validateConfiguration(saved,{...clone(defaults)}); localStorage.setItem("preparation-debits-customized","1"); syncEditorStatus(true); }
+} catch { await removeLocalConfiguration(); }
+syncEditorStatus(Boolean(localStorage.getItem("preparation-debits-customized")));
+render();
