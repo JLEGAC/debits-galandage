@@ -5,7 +5,7 @@ const $ = id => document.getElementById(id);
 const escapeHtml = value => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 const selectOptions = {
   vantail:[["", "Tous"], ["simple", "Simple"], ["double", "Double"]],
-  imposte:[["", "Avec ou sans imposte"], ["sans", "Toute hauteur"], ["avec", "Avec imposte"]],
+  imposte:[["tous", "Avec ou sans imposte"], ["sans", "Toute hauteur"], ["avec", "Avec imposte"]],
   materiau:[["", "Tous matériaux"], ["bois", "Bois"], ["aluminium", "Aluminium"]],
   remplissage:[["", "Tous remplissages"], ["vitré", "Vitré"], ["plein", "Plein"]]
 };
@@ -26,7 +26,7 @@ function conditionSelect(key, value, relationId) {
 function conditionSummary(rule) {
   const parts = [];
   if (rule.vantail) parts.push(rule.vantail === "simple" ? "Simple vantail" : "Double vantail");
-  if (rule.imposte) parts.push(rule.imposte === "avec" ? "Avec imposte" : "Toute hauteur");
+  if (rule.imposte) parts.push(rule.imposte === "tous" ? "Avec ou sans imposte" : rule.imposte === "avec" ? "Avec imposte" : "Toute hauteur");
   if (rule.materiau) parts.push(rule.materiau === "bois" ? "Bois" : "Aluminium");
   if (rule.remplissage) parts.push(rule.remplissage === "vitré" ? "Vitré" : "Plein");
   return parts.length ? parts.join(" · ") : "Tous les cas";

@@ -29,7 +29,7 @@ export function validateConfiguration(candidate, defaults) {
     if (variables.some(name => !knownDimensions.has(name))) throw Error(`Une cote de la relation « ${relation.id} » n’existe pas.`);
     try { solveRelations([{ equation:relation.equation }], {}); } catch { throw Error(`La syntaxe de l’équation « ${relation.equation} » n’est pas prise en charge.`); }
     for (const [key, allowed] of Object.entries({
-      vantail:["simple", "double"], imposte:["avec", "sans"],
+      vantail:["simple", "double"], imposte:["avec", "sans", "tous"],
       materiau:["bois", "aluminium"], remplissage:["vitré", "plein"]
     })) {
       if (relation[key] != null && !allowed.includes(relation[key])) throw Error(`Condition invalide pour la relation « ${relation.id} ».`);

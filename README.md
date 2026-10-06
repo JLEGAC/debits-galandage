@@ -8,7 +8,7 @@ Ouvrir **Personnaliser** pour modifier les éléments disponibles. Les condition
 
 Les changements sont conservés sur l’appareil dans IndexedDB, avec un repli sur le stockage local du navigateur. Ils ne modifient pas le dépôt Git ni les règles des autres utilisateurs. Utiliser **Exporter JSON** et **Importer JSON** pour transférer une configuration. **Restaurer l’origine** rétablit le jeu de règles livré avec la PWA.
 
-La source initiale des règles est `data/regles-calcul.json`. Les calculs sont répartis entre `src/formulas.js`, `src/calculation.js` et `src/cutlist.js`. La configuration importée est vérifiée avant son application. Le format est réservé aux cotes et profils déjà prévus ; il ne permet pas encore d’ajouter de nouveaux champs ou profils.
+La source initiale des règles est `data/regles-calcul.json`. Chaque relation précise explicitement si elle vaut avec imposte, sans imposte (toute hauteur) ou dans les deux cas. Les calculs sont répartis entre `src/formulas.js`, `src/calculation.js` et `src/cutlist.js`. La configuration importée est vérifiée avant son application. Le format est réservé aux cotes et profils déjà prévus ; il ne permet pas encore d’ajouter de nouveaux champs ou profils.
 
 ## Comportement de calcul
 

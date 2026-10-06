@@ -24,3 +24,15 @@ test("double vantail avec imposte utilise les règles de matériau et de remplis
   assert.equal(rows.find(row=>row.id==="depart-mur-imposte").quantity,2);
   assert.equal(rows.some(row=>row.id==="parclose"),false);
 });
+
+test("chaque relation précise son contexte d’imposte et les règles communes restent actives dans les deux cas",()=>{
+  assert.ok(rules.relations.every(rule=>["avec", "sans", "tous"].includes(rule.imposte)));
+  const common = rules.relations.filter(rule=>rule.imposte==="tous");
+  for (const imposte of ["avec", "sans"]) {
+    const result=calculerProjet(rules,{vantail:"simple",imposte,materiau:"bois",remplissage:"vitré"},{LP:900,HSP:2500});
+    assert.equal(result.values.LHP,841);
+    assert.equal(result.values.LB,795);
+  }
+  assert.ok(common.some(rule=>rule.id==="lhp-simple"));
+  assert.ok(common.some(rule=>rule.id==="lhf-mpr"));
+});

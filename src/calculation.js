@@ -7,7 +7,7 @@ function dimensionsFromEquation(equation) {
 
 function ruleApplies(rule, options) {
   return (!rule.vantail || rule.vantail === options.vantail) &&
-    (!rule.imposte || rule.imposte === options.imposte) &&
+    (!rule.imposte || rule.imposte === "tous" || rule.imposte === options.imposte) &&
     (!rule.materiau || rule.materiau === options.materiau) &&
     (!rule.remplissage || rule.remplissage === options.remplissage);
 }

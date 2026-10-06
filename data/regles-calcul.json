@@ -26,65 +26,362 @@
     "DMI": "Hauteur du départ mur d’imposte"
   },
   "visibiliteCotes": {
-    "MPR": {"vantail": "simple"}
+    "MPR": {
+      "vantail": "simple"
+    }
   },
   "relations": [
-    {"id":"largeur-pl-simple","vantail":"simple","equation":"PL = LP - 124"},
-    {"id":"largeur-pl-double","vantail":"double","equation":"PL = 2 * LP - 247"},
-    {"id":"em-mini-simple","vantail":"simple","equation":"EM = 2 * LP - 73","minimum":true},
-    {"id":"em-mini-double","vantail":"double","equation":"EM = 4 * LP - 177","minimum":true},
-    {"id":"entraxe-em","equation":"ENTRAXE = EM + 36"},
-    {"id":"adl-simple","vantail":"simple","equation":"ADL = 2 * LP + 3"},
-    {"id":"adl-double","vantail":"double","equation":"ADL = 4 * LP - 101"},
-    {"id":"lb-min-simple","vantail":"simple","equation":"LBmini = LP - 105","minimum":true},
-    {"id":"lb-min-double","vantail":"double","equation":"LBmini = LP - 105","minimum":true},
-    {"id":"mpr-min","vantail":"simple","equation":"MPR = 2 * LP - 96","minimum":true},
-    {"id":"lb-mpr","vantail":"simple","equation":"LB = MPR - LP - 9"},
-    {"id":"lhf-mpr","vantail":"simple","equation":"LHF = MPR - LP - 9"},
-    {"id":"lb-em","vantail":"double","equation":"LB = EM / 2 - LP - 16.2"},
-    {"id":"lhf-em","vantail":"double","equation":"LHF = EM / 2 - LP - 16.2"},
-    {"id":"lrem-lb","equation":"LREM = LB + 19"},
-    {"id":"lhp-simple","vantail":"simple","equation":"LHP = LP - 59"},
-    {"id":"lhp-double","vantail":"double","equation":"LHP = 2 * LP - 103"},
-    {"id":"rail-simple","vantail":"simple","equation":"LRAIL = EM - 23"},
-    {"id":"rail-double","vantail":"double","equation":"LRAIL = EM - 20"},
-    {"id":"hsr-sep","equation":"HSR = SEP - 36"},
-    {"id":"hpar-hsr","equation":"HPAR = HSR + 24"},
-    {"id":"hrf-vitree","remplissage":"vitré","equation":"HRF = HSP - 52.8"},
-    {"id":"hrf-plein","remplissage":"plein","equation":"HRF = HSP - 50.3"},
-    {"id":"sep-hsp-toute-hauteur","imposte":"sans","equation":"SEP = HSP - 24.5"},
-    {"id":"hp-bois-sans-imposte","imposte":"sans","materiau":"bois","equation":"HP = SEP - 55"},
-    {"id":"hp-aluminium-sans-imposte","imposte":"sans","materiau":"aluminium","equation":"HP = SEP - 60"},
-    {"id":"hp-bois-avec-imposte","imposte":"avec","materiau":"bois","equation":"HP = SEP - 55"},
-    {"id":"hp-aluminium-avec-imposte","imposte":"avec","materiau":"aluminium","equation":"HP = SEP - 60"},
-    {"id":"hri-vitree","imposte":"avec","remplissage":"vitré","equation":"HRI = HSP - SEP - 32"},
-    {"id":"hri-pleine","imposte":"avec","remplissage":"plein","equation":"HRI = HSP - SEP - 24"},
-    {"id":"sep-hri-vitree","imposte":"avec","remplissage":"vitré","equation":"SEP = HSP - HRI - 32"},
-    {"id":"sep-hri-pleine","imposte":"avec","remplissage":"plein","equation":"SEP = HSP - HRI - 24"},
-    {"id":"cji-imposte","imposte":"avec","equation":"CJI = HSP - SEP - 58"},
-    {"id":"dmi-imposte","imposte":"avec","equation":"DMI = HSP - SEP - 29.5"}
+    {
+      "id": "largeur-pl-simple",
+      "vantail": "simple",
+      "equation": "PL = LP - 124",
+      "imposte": "tous"
+    },
+    {
+      "id": "largeur-pl-double",
+      "vantail": "double",
+      "equation": "PL = 2 * LP - 247",
+      "imposte": "tous"
+    },
+    {
+      "id": "em-mini-simple",
+      "vantail": "simple",
+      "equation": "EM = 2 * LP - 73",
+      "minimum": true,
+      "imposte": "tous"
+    },
+    {
+      "id": "em-mini-double",
+      "vantail": "double",
+      "equation": "EM = 4 * LP - 177",
+      "minimum": true,
+      "imposte": "tous"
+    },
+    {
+      "id": "entraxe-em",
+      "equation": "ENTRAXE = EM + 36",
+      "imposte": "tous"
+    },
+    {
+      "id": "adl-simple",
+      "vantail": "simple",
+      "equation": "ADL = 2 * LP + 3",
+      "imposte": "tous"
+    },
+    {
+      "id": "adl-double",
+      "vantail": "double",
+      "equation": "ADL = 4 * LP - 101",
+      "imposte": "tous"
+    },
+    {
+      "id": "lb-min-simple",
+      "vantail": "simple",
+      "equation": "LBmini = LP - 105",
+      "minimum": true,
+      "imposte": "tous"
+    },
+    {
+      "id": "lb-min-double",
+      "vantail": "double",
+      "equation": "LBmini = LP - 105",
+      "minimum": true,
+      "imposte": "tous"
+    },
+    {
+      "id": "mpr-min",
+      "vantail": "simple",
+      "equation": "MPR = 2 * LP - 96",
+      "minimum": true,
+      "imposte": "tous"
+    },
+    {
+      "id": "lb-mpr",
+      "vantail": "simple",
+      "equation": "LB = MPR - LP - 9",
+      "imposte": "tous"
+    },
+    {
+      "id": "lhf-mpr",
+      "vantail": "simple",
+      "equation": "LHF = MPR - LP - 9",
+      "imposte": "tous"
+    },
+    {
+      "id": "lb-em",
+      "vantail": "double",
+      "equation": "LB = EM / 2 - LP - 16.2",
+      "imposte": "tous"
+    },
+    {
+      "id": "lhf-em",
+      "vantail": "double",
+      "equation": "LHF = EM / 2 - LP - 16.2",
+      "imposte": "tous"
+    },
+    {
+      "id": "lrem-lb",
+      "equation": "LREM = LB + 19",
+      "imposte": "tous"
+    },
+    {
+      "id": "lhp-simple",
+      "vantail": "simple",
+      "equation": "LHP = LP - 59",
+      "imposte": "tous"
+    },
+    {
+      "id": "lhp-double",
+      "vantail": "double",
+      "equation": "LHP = 2 * LP - 103",
+      "imposte": "tous"
+    },
+    {
+      "id": "rail-simple",
+      "vantail": "simple",
+      "equation": "LRAIL = EM - 23",
+      "imposte": "tous"
+    },
+    {
+      "id": "rail-double",
+      "vantail": "double",
+      "equation": "LRAIL = EM - 20",
+      "imposte": "tous"
+    },
+    {
+      "id": "hsr-sep",
+      "equation": "HSR = SEP - 36",
+      "imposte": "tous"
+    },
+    {
+      "id": "hpar-hsr",
+      "equation": "HPAR = HSR + 24",
+      "imposte": "tous"
+    },
+    {
+      "id": "hrf-vitree",
+      "remplissage": "vitré",
+      "equation": "HRF = HSP - 52.8",
+      "imposte": "tous"
+    },
+    {
+      "id": "hrf-plein",
+      "remplissage": "plein",
+      "equation": "HRF = HSP - 50.3",
+      "imposte": "tous"
+    },
+    {
+      "id": "sep-hsp-toute-hauteur",
+      "imposte": "sans",
+      "equation": "SEP = HSP - 24.5"
+    },
+    {
+      "id": "hp-bois-sans-imposte",
+      "imposte": "sans",
+      "materiau": "bois",
+      "equation": "HP = SEP - 55"
+    },
+    {
+      "id": "hp-aluminium-sans-imposte",
+      "imposte": "sans",
+      "materiau": "aluminium",
+      "equation": "HP = SEP - 60"
+    },
+    {
+      "id": "hp-bois-avec-imposte",
+      "imposte": "avec",
+      "materiau": "bois",
+      "equation": "HP = SEP - 55"
+    },
+    {
+      "id": "hp-aluminium-avec-imposte",
+      "imposte": "avec",
+      "materiau": "aluminium",
+      "equation": "HP = SEP - 60"
+    },
+    {
+      "id": "hri-vitree",
+      "imposte": "avec",
+      "remplissage": "vitré",
+      "equation": "HRI = HSP - SEP - 32"
+    },
+    {
+      "id": "hri-pleine",
+      "imposte": "avec",
+      "remplissage": "plein",
+      "equation": "HRI = HSP - SEP - 24"
+    },
+    {
+      "id": "sep-hri-vitree",
+      "imposte": "avec",
+      "remplissage": "vitré",
+      "equation": "SEP = HSP - HRI - 32"
+    },
+    {
+      "id": "sep-hri-pleine",
+      "imposte": "avec",
+      "remplissage": "plein",
+      "equation": "SEP = HSP - HRI - 24"
+    },
+    {
+      "id": "cji-imposte",
+      "imposte": "avec",
+      "equation": "CJI = HSP - SEP - 58"
+    },
+    {
+      "id": "dmi-imposte",
+      "imposte": "avec",
+      "equation": "DMI = HSP - SEP - 29.5"
+    }
   ],
   "limites": [
-    {"cote":"EM","maximum":3000,"message":"La cote intérieure entre montants est limitée à 3 000 mm."},
-    {"cote":"HSP","maximum":3000,"message":"La hauteur sous plafond ne doit pas dépasser 3 000 mm."}
+    {
+      "cote": "EM",
+      "maximum": 3000,
+      "message": "La cote intérieure entre montants est limitée à 3 000 mm."
+    },
+    {
+      "cote": "HSP",
+      "maximum": 3000,
+      "message": "La hauteur sous plafond ne doit pas dépasser 3 000 mm."
+    }
   ],
   "debits": [
-    {"id":"rail","profil":"Rail","quantite":1,"longueur":"LRAIL","cas":"tous","note":"Une pièce quelle que soit la configuration."},
-    {"id":"montant-renforce","profil":"Montant renforcé","regleQuantite":"montantsParVantail","longueur":"HSP","cas":"tous","note":"2 en simple vantail, 4 en double vantail."},
-    {"id":"montant-passage","profil":"Montant de passage","regleQuantite":"montantsParVantail","longueur":"HSP","cas":"tous","note":"2 en simple vantail, 4 en double vantail."},
-    {"id":"montant-prepare","profil":"Montant préparé pour l’environnement de pose","quantite":2,"longueur":"HSP","cas":"tous","note":"Toujours 2 montants."},
-    {"id":"cj-renforce","profil":"Couvre-joint sur montant renforcé","regleQuantite":"montantsParVantail","longueur":"HSP","cas":"tous","note":"Un par montant renforcé, de même longueur."},
-    {"id":"cj-prepare","profil":"Couvre-joint sur montant préparé","quantite":4,"longueur":"HSP","cas":"tous","note":"Deux par montant préparé ; 2 montants préparés."},
-    {"id":"lisse-haute-fixe","profil":"Lisse haute côté partie fixe","regleQuantite":"lissesParVantail","longueur":"LHF","cas":"imposte","note":"1 en simple vantail, 2 en double vantail."},
-    {"id":"lisse-haute-passage","profil":"Lisse haute côté passage","quantite":1,"longueur":"LHP","cas":"imposte","note":"1 pièce en simple ou double vantail."},
-    {"id":"cj-haut","profil":"Couvre-joint haut côté passage","quantite":2,"longueur":"LHP","cas":"tous","note":"Deux pièces, avec imposte ou en toute hauteur."},
-    {"id":"parclose","profil":"Parclose de finition","regleQuantite":"partiesFixes","longueur":"HPAR","cas":"partie-fixe-vitree","note":"1 en simple vantail, 2 en double ; uniquement si les parties fixes sont vitrées."},
-    {"id":"profil-reception","profil":"Profil de réception","quantite":1,"longueur":"HSP","cas":"simple","note":"Une pièce en simple vantail ; non prévu en double vantail."},
-    {"id":"lisse-basse-fixe","profil":"Lisse basse de la partie fixe","regleQuantite":"partiesFixes","longueur":"LB","cas":"partie-fixe","note":"Une pièce par partie fixe."},
-    {"id":"couvercle-fixe","profil":"Couvercle de finition côté partie fixe","regleQuantite":"lissesParVantail","longueur":"LHF","cas":"sans-imposte","note":"1 en simple vantail, 2 en double vantail."},
-    {"id":"couvercle-passage","profil":"Couvercle de finition côté passage","quantite":1,"longueur":"LHP","cas":"sans-imposte","note":"1 pièce en simple ou double vantail."},
-    {"id":"enjoliveur","profil":"Profil enjoliveur côté partie fixe","regleQuantite":"facesPartiesFixes","longueur":"LHF","cas":"partie-fixe-vitree","note":"Deux faces pour chaque partie fixe vitrée."},
-    {"id":"couvre-joint-imposte","profil":"Couvre-joint d’imposte","quantite":2,"longueur":"CJI","cas":"imposte","note":"2 pièces avec imposte."},
-    {"id":"depart-mur-imposte","profil":"Départ mur d’imposte","quantite":2,"longueur":"DMI","cas":"imposte","note":"2 pièces avec imposte, vitrée ou pleine."}
+    {
+      "id": "rail",
+      "profil": "Rail",
+      "quantite": 1,
+      "longueur": "LRAIL",
+      "cas": "tous",
+      "note": "Une pièce quelle que soit la configuration."
+    },
+    {
+      "id": "montant-renforce",
+      "profil": "Montant renforcé",
+      "regleQuantite": "montantsParVantail",
+      "longueur": "HSP",
+      "cas": "tous",
+      "note": "2 en simple vantail, 4 en double vantail."
+    },
+    {
+      "id": "montant-passage",
+      "profil": "Montant de passage",
+      "regleQuantite": "montantsParVantail",
+      "longueur": "HSP",
+      "cas": "tous",
+      "note": "2 en simple vantail, 4 en double vantail."
+    },
+    {
+      "id": "montant-prepare",
+      "profil": "Montant préparé pour l’environnement de pose",
+      "quantite": 2,
+      "longueur": "HSP",
+      "cas": "tous",
+      "note": "Toujours 2 montants."
+    },
+    {
+      "id": "cj-renforce",
+      "profil": "Couvre-joint sur montant renforcé",
+      "regleQuantite": "montantsParVantail",
+      "longueur": "HSP",
+      "cas": "tous",
+      "note": "Un par montant renforcé, de même longueur."
+    },
+    {
+      "id": "cj-prepare",
+      "profil": "Couvre-joint sur montant préparé",
+      "quantite": 4,
+      "longueur": "HSP",
+      "cas": "tous",
+      "note": "Deux par montant préparé ; 2 montants préparés."
+    },
+    {
+      "id": "lisse-haute-fixe",
+      "profil": "Lisse haute côté partie fixe",
+      "regleQuantite": "lissesParVantail",
+      "longueur": "LHF",
+      "cas": "imposte",
+      "note": "1 en simple vantail, 2 en double vantail."
+    },
+    {
+      "id": "lisse-haute-passage",
+      "profil": "Lisse haute côté passage",
+      "quantite": 1,
+      "longueur": "LHP",
+      "cas": "imposte",
+      "note": "1 pièce en simple ou double vantail."
+    },
+    {
+      "id": "cj-haut",
+      "profil": "Couvre-joint haut côté passage",
+      "quantite": 2,
+      "longueur": "LHP",
+      "cas": "tous",
+      "note": "Deux pièces, avec imposte ou en toute hauteur."
+    },
+    {
+      "id": "parclose",
+      "profil": "Parclose de finition",
+      "regleQuantite": "partiesFixes",
+      "longueur": "HPAR",
+      "cas": "partie-fixe-vitree",
+      "note": "1 en simple vantail, 2 en double ; uniquement si les parties fixes sont vitrées."
+    },
+    {
+      "id": "profil-reception",
+      "profil": "Profil de réception",
+      "quantite": 1,
+      "longueur": "HSP",
+      "cas": "simple",
+      "note": "Une pièce en simple vantail ; non prévu en double vantail."
+    },
+    {
+      "id": "lisse-basse-fixe",
+      "profil": "Lisse basse de la partie fixe",
+      "regleQuantite": "partiesFixes",
+      "longueur": "LB",
+      "cas": "partie-fixe",
+      "note": "Une pièce par partie fixe."
+    },
+    {
+      "id": "couvercle-fixe",
+      "profil": "Couvercle de finition côté partie fixe",
+      "regleQuantite": "lissesParVantail",
+      "longueur": "LHF",
+      "cas": "sans-imposte",
+      "note": "1 en simple vantail, 2 en double vantail."
+    },
+    {
+      "id": "couvercle-passage",
+      "profil": "Couvercle de finition côté passage",
+      "quantite": 1,
+      "longueur": "LHP",
+      "cas": "sans-imposte",
+      "note": "1 pièce en simple ou double vantail."
+    },
+    {
+      "id": "enjoliveur",
+      "profil": "Profil enjoliveur côté partie fixe",
+      "regleQuantite": "facesPartiesFixes",
+      "longueur": "LHF",
+      "cas": "partie-fixe-vitree",
+      "note": "Deux faces pour chaque partie fixe vitrée."
+    },
+    {
+      "id": "couvre-joint-imposte",
+      "profil": "Couvre-joint d’imposte",
+      "quantite": 2,
+      "longueur": "CJI",
+      "cas": "imposte",
+      "note": "2 pièces avec imposte."
+    },
+    {
+      "id": "depart-mur-imposte",
+      "profil": "Départ mur d’imposte",
+      "quantite": 2,
+      "longueur": "DMI",
+      "cas": "imposte",
+      "note": "2 pièces avec imposte, vitrée ou pleine."
+    }
   ]
 }
